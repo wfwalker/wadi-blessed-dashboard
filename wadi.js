@@ -33,11 +33,11 @@ var bugList = grid.set(1, 0, 1, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'wadi bugs',
-    columnWidth: [30, 30]
+    columnWidth: [15, 15, 80]
 });
 
 var bugListData = {
-    headers: ['id', 'title'],
+    headers: ['id', 'status', 'title'],
     data: [ ]
 };
 
@@ -55,11 +55,15 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
     var depends_on_list = tracker.bugs[0].depends_on;
 
     for (var bugIndex in depends_on_list) {
-	
-	bugListData.data.push([depends_on_list[bugIndex], 'b']);
+        var bugID = depends_on_list[bugIndex];
+
+        request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex], function(error, response, body) {
+            var trackedBug = JSON.parse(body).bugs[0];
+            bugListData.data.push([bugID, trackedBug.status, trackedBug.summary]);
+            bugList.setData(bugListData);
+        });
     }
-    bugList.setData(bugListData);
-    screen.render();
+
 });
 
 
