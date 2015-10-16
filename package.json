@@ -1,0 +1,8 @@
+{
+  "name": "WADI-blessed-dashboard",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^2.4.1",
+    "request": "^2.65.0"
+  }
+}
