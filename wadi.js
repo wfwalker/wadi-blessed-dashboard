@@ -33,7 +33,7 @@ var bugList = grid.set(1, 0, 1, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'wadi bugs',
-    columnWidth: [15, 15, 80]
+    columnWidth: [10, 10, 150]
 });
 
 var bugListData = {
