@@ -117,7 +117,13 @@ request(githubApiOptions, function(error, response, body) {
         var activities = JSON.parse(body);
         for (var activityIndex in activities) {
             var anActivity = activities[activityIndex];
-            githubActivityData.data.push([anActivity.created_at, anActivity.type]);
+            if (anActivity.type == 'IssueCommentEvent') {
+                githubActivityData.data.push([anActivity.created_at, anActivity.payload.comment.body]);
+            } else if (anActivity.type == 'IssuesEvent') {
+                githubActivityData.data.push([anActivity.created_at, anActivity.payload.issue.body]);
+            } else {
+                githubActivityData.data.push([anActivity.created_at, anActivity.type]);
+            }
             githubActivity.setData(githubActivityData);
         }
     }
