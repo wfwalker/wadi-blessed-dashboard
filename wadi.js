@@ -59,7 +59,7 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
         request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex], function(error, response, body) {
             var trackedBug = JSON.parse(body).bugs[0];
-            bugListData.data.push([bugID, trackedBug.status, trackedBug.summary]);
+            bugListData.data.push([trackedBug.id, trackedBug.status, trackedBug.summary]);
             bugList.setData(bugListData);
         });
     }
