@@ -121,6 +121,11 @@ var githubApiOptions = {
 request(githubApiOptions, function(error, response, body) {
     try {
         var activities = JSON.parse(body);
+
+        if (activities.message) {
+            throw new Error(activities.message);
+        }
+
         for (var activityIndex in activities) {
             var anActivity = activities[activityIndex];
 
