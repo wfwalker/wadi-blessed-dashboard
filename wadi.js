@@ -58,11 +58,11 @@ var githubActivity = grid.set(0, 1, 1, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'github activity',
-    columnWidth: [20, 150]
+    columnWidth: [20, 10, 150]
 })
 
 var githubActivityData = {
-    headers: ['id', 'title'],
+    headers: ['date', 'actor', 'title'],
     data: [ ]
 };
 
@@ -75,11 +75,6 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
     return process.exit(0);
 });
 
-// first screen render
-
-screen.render();
-
-// TODO: 
 
 // go find all the bugs we are tracking for WADI
 
@@ -128,18 +123,31 @@ request(githubApiOptions, function(error, response, body) {
         var activities = JSON.parse(body);
         for (var activityIndex in activities) {
             var anActivity = activities[activityIndex];
+
+            var activityDescription = anActivity.type;
+            var activityActor = 'somebody';
+
             if (anActivity.type == 'IssueCommentEvent') {
-                githubActivityData.data.push([anActivity.created_at, anActivity.payload.comment.body]);
+                activityActor = anActivity.payload.comment.user.login;
+                activityDescription = anActivity.payload.comment.body;
             } else if (anActivity.type == 'IssuesEvent') {
-                githubActivityData.data.push([anActivity.created_at, anActivity.payload.issue.body]);
-            } else {
-                githubActivityData.data.push([anActivity.created_at, anActivity.type]);
+                activityActor = anActivity.payload.issue.user.login;
+                activityDescription = anActivity.payload.issue.body;
+            } else if (anActivity.type == 'PullRequestEvent') {
+                activityActor = anActivity.payload.pull_request.user.login;
+                activityDescription = anActivity.payload.pull_request.title;
+            } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
+                activityActor = anActivity.payload.comment.user.login;
+                activityDescription = anActivity.payload.comment.body;
             }
+
+            githubActivityData.data.push([anActivity.created_at, activityActor, activityDescription]);
             githubActivity.setData(githubActivityData);
         }
     }
     catch(e) {
         console.log('cannot parse events json', e);
+        console.log(e.stack);
     }
 });
 
