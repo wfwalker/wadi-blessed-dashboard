@@ -20,7 +20,7 @@ var line = grid.set(0, 0, 1, 2, contrib.line, {
     xPadding: 5
 });
 
-var data = {
+var lineData = {
     x: [],
     y: []
 };
@@ -28,12 +28,12 @@ var data = {
 // initialize the line graph with random data
 
 for (var index = 0; index < 50; index++) {
-    data.x.push('t'+index);
-    data.y.push(Math.floor(Math.random() * 10));
+    lineData.x.push('t'+index);
+    lineData.y.push(Math.floor(Math.random() * 10));
 }
 
 screen.append(line);
-line.setData([data]);
+line.setData([lineData]);
 
 // create a table for bugzilla bugs
 
@@ -41,11 +41,11 @@ var bugList = grid.set(1, 0, 1, 2, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'wadi bugs',
-    columnWidth: [10, 10, 150]
+    columnWidth: [10, 20, 10, 150]
 });
 
 var bugListData = {
-    headers: ['id', 'status', 'title'],
+    headers: ['id', 'assignee', 'status', 'title'],
     data: [ ]
 };
 
@@ -79,7 +79,11 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key) {
 
 screen.render();
 
+// TODO: 
+
 // go find all the bugs we are tracking for WADI
+
+// TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
 
 request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response, body) {
     var tracker = JSON.parse(body);
@@ -96,7 +100,12 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
             // add info about that tracked bug to the table
             // NOTE: do not update the display now, it will get updated later
-            bugListData.data.push([trackedBug.id, trackedBug.status, trackedBug.summary]);
+            var assignee = '';
+            if (trackedBug.assigned_to != 'nobody@mozilla.org') {
+                assignee = trackedBug.assigned_to;
+            }
+
+            bugListData.data.push([trackedBug.id, assignee, trackedBug.status, trackedBug.summary]);
             bugList.setData(bugListData);
         });
     }
@@ -105,8 +114,10 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
 // go find all the activity for wadi repo's
 
+// TODO: combine multiple event streams sort by date
+
 var githubApiOptions = {
-  url: 'https://api.github.com/repos/mozilla/wadi/events',
+  url: 'https://api.github.com/repos/mozilla/oghliner/events',
   headers: {
     'User-Agent': 'wfwalker'
   }
@@ -138,10 +149,10 @@ request(githubApiOptions, function(error, response, body) {
 setInterval(function() {
     line.setLabel(new Date().toString());
 
-    data.y.shift();
-    data.y.push(Math.floor(Math.random() * 10));
+    lineData.y.shift();
+    lineData.y.push(Math.floor(Math.random() * 10));
 
-    line.setData([data]);
+    line.setData([lineData]);
 
     screen.render();
 }, 5000);
