@@ -4,6 +4,17 @@
 var request = require('request');
 var blessed = require('blessed');
 var contrib = require('blessed-contrib');
+var githubapi = require("github");
+ 
+var github = new githubapi({
+    // required 
+    version: "3.0.0",
+    // optional 
+    debug: true,
+    protocol: "https",
+    host: "api.github.com", // should be api.github.com for GitHub 
+    timeout: 5000
+});
 
 // set up a grid with two rows and one column
 
@@ -88,19 +99,10 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
 // TODO: combine multiple event streams sort by date
 
-var githubApiOptions = {
-  url: 'https://api.github.com/repos/mozilla/oghliner/events',
-  headers: {
-    'User-Agent': 'wfwalker'
-  }
-};
-
-request(githubApiOptions, function(error, response, body) {
+github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner' }, function(err, activities) {
     try {
-        var activities = JSON.parse(body);
-
-        if (activities.message) {
-            throw new Error(activities.message);
+        if (err) {
+            throw new Error(err.message);
         }
 
         for (var activityIndex in activities) {
@@ -129,8 +131,10 @@ request(githubApiOptions, function(error, response, body) {
                 activityDescription = anActivity.payload.description;
             }
 
-            githubActivityData.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
-            githubActivity.setData(githubActivityData);
+            if (anActivity.type) {
+                githubActivityData.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
+                githubActivity.setData(githubActivityData);                
+            }
         }
     }
     catch(e) {
