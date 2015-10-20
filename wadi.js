@@ -4,9 +4,9 @@
 var request = require('request');
 var blessed = require('blessed');
 var contrib = require('blessed-contrib');
-var githubapi = require("github");
- 
-var github = new githubapi({
+var GitHubAPI = require("github");
+
+var github = new GitHubAPI({
     // required 
     version: "3.0.0",
     // optional 
@@ -47,7 +47,7 @@ var githubActivity = grid.set(0, 1, 2, 1, contrib.table, {
     label: 'github activity',
     columnWidth: [10, 10, 150],
     columnSpacing: 3
-})
+});
 
 var githubActivityData = {
     headers: ['date', 'actor', 'title'],
