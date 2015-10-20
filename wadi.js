@@ -58,7 +58,7 @@ var githubActivity = grid.set(0, 1, 1, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'github activity',
-    columnWidth: [20, 10, 150]
+    columnWidth: [10, 10, 150]
 })
 
 var githubActivityData = {
@@ -146,7 +146,7 @@ request(githubApiOptions, function(error, response, body) {
                 activityDescription = anActivity.payload.comment.body;
             }
 
-            githubActivityData.data.push([anActivity.created_at, activityActor, activityDescription]);
+            githubActivityData.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
             githubActivity.setData(githubActivityData);
         }
     }
