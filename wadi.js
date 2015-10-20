@@ -1,5 +1,7 @@
-var request = require('request');
+// Whole-script strict mode syntax
+"use strict";
 
+var request = require('request');
 var blessed = require('blessed');
 var contrib = require('blessed-contrib');
 
@@ -8,36 +10,9 @@ var contrib = require('blessed-contrib');
 var screen = blessed.screen();
 var grid = new contrib.grid({rows: 2, cols: 2, screen: screen});
 
-// create a line graph
-
-var line = grid.set(0, 0, 1, 2, contrib.line, {
-    style: {
-	line: "yellow",
-	text: "green",
-	baseline: "black"
-    },
-    xLabelPadding: 3,
-    xPadding: 5
-});
-
-var lineData = {
-    x: [],
-    y: []
-};
-
-// initialize the line graph with random data
-
-for (var index = 0; index < 50; index++) {
-    lineData.x.push('t'+index);
-    lineData.y.push(Math.floor(Math.random() * 10));
-}
-
-screen.append(line);
-line.setData([lineData]);
-
 // create a table for bugzilla bugs
 
-var bugList = grid.set(1, 0, 1, 2, contrib.table, {
+var bugList = grid.set(0, 0, 2, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'wadi bugs',
@@ -54,7 +29,7 @@ bugList.setData(bugListData);
 
 // create table for github activity
 
-var githubActivity = grid.set(0, 1, 1, 1, contrib.table, {
+var githubActivity = grid.set(0, 1, 2, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'github activity',
@@ -130,7 +105,7 @@ request(githubApiOptions, function(error, response, body) {
             var anActivity = activities[activityIndex];
 
             var activityDescription = anActivity.type;
-            var activityActor = 'somebody';
+            var activityActor = '';
 
             if (anActivity.type == 'IssueCommentEvent') {
                 activityActor = anActivity.payload.comment.user.login;
@@ -144,6 +119,12 @@ request(githubApiOptions, function(error, response, body) {
             } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
                 activityActor = anActivity.payload.comment.user.login;
                 activityDescription = anActivity.payload.comment.body;
+            } else if (anActivity.type == 'PushEvent') {
+                activityActor = anActivity.payload.commits[0].author.email;
+                activityDescription = anActivity.payload.commits[0].message;
+            } else if (anActivity.type == 'CreateEvent') {
+                activityActor = '';
+                activityDescription = anActivity.payload.description;
             }
 
             githubActivityData.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
@@ -160,12 +141,5 @@ request(githubApiOptions, function(error, response, body) {
 // on a recurring basis, update the display of random values and re-render
 
 setInterval(function() {
-    line.setLabel(new Date().toString());
-
-    lineData.y.shift();
-    lineData.y.push(Math.floor(Math.random() * 10));
-
-    line.setData([lineData]);
-
     screen.render();
 }, 5000);
