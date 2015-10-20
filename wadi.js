@@ -16,7 +16,8 @@ var bugList = grid.set(0, 0, 2, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'wadi bugs',
-    columnWidth: [10, 20, 10, 150]
+    columnWidth: [10, 20, 10, 150],
+    columnSpacing: 3
 });
 
 var bugListData = {
@@ -33,7 +34,8 @@ var githubActivity = grid.set(0, 1, 2, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'github activity',
-    columnWidth: [10, 10, 150]
+    columnWidth: [10, 10, 150],
+    columnSpacing: 3
 })
 
 var githubActivityData = {
