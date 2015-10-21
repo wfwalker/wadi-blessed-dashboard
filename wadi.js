@@ -4,9 +4,9 @@
 var request = require('request');
 var blessed = require('blessed');
 var contrib = require('blessed-contrib');
-var GitHubAPI = require("github");
+var GitHub = require("github");
 
-var github = new GitHubAPI({
+var github = new GitHub({
     // required 
     version: "3.0.0",
     // optional 
