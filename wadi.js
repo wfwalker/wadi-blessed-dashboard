@@ -2,9 +2,9 @@
 "use strict";
 
 var request = require('request');
+var GitHub = require("github");
 var blessed = require('blessed');
 var contrib = require('blessed-contrib');
-var GitHub = require("github");
 
 var github = new GitHub({
     // required 
@@ -12,8 +12,15 @@ var github = new GitHub({
     // optional 
     debug: true,
     protocol: "https",
-    host: "api.github.com", // should be api.github.com for GitHub 
+    host: "api.github.com",
     timeout: 5000
+});
+
+console.log();
+
+github.authenticate({
+    type: "oauth",
+    token: process.env.SEKRIT
 });
 
 // set up a grid with two rows and one column
@@ -99,7 +106,7 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
 // TODO: combine multiple event streams sort by date
 
-github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner' }, function(err, activities) {
+github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner', per_page: 100 }, function(err, activities) {
     try {
         if (err) {
             throw new Error(err.message);
