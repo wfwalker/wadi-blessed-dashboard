@@ -10,7 +10,7 @@ var github = new GitHub({
     // required 
     version: "3.0.0",
     // optional 
-    debug: true,
+    debug: false,
     protocol: "https",
     host: "api.github.com",
     timeout: 5000
@@ -48,7 +48,7 @@ bugList.setData(bugListData);
 
 // create table for github activity
 
-var githubActivity = grid.set(0, 1, 2, 1, contrib.table, {
+var activityWidget = grid.set(0, 1, 2, 1, contrib.table, {
     keys: true,
     fg: 'white',
     label: 'github activity',
@@ -56,13 +56,13 @@ var githubActivity = grid.set(0, 1, 2, 1, contrib.table, {
     columnSpacing: 3
 });
 
-var githubActivityData = {
+var activityTable = {
     headers: ['date', 'actor', 'title'],
     data: [ ]
 };
 
-screen.append(githubActivity);
-githubActivity.setData(githubActivityData);
+screen.append(activityWidget);
+activityWidget.setData(activityTable);
 
 // make sure its possible to exit
 
@@ -105,54 +105,56 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 // go find all the activity for wadi repo's
 
 // TODO: combine multiple event streams sort by date
-
-github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner', per_page: 100 }, function(err, activities) {
-    try {
-        if (err) {
-            throw new Error(err.message);
-        }
-
-        for (var activityIndex in activities) {
-            var anActivity = activities[activityIndex];
-
-            var activityDescription = anActivity.type;
-            var activityActor = '';
-
-            if (anActivity.type == 'IssueCommentEvent') {
-                activityActor = anActivity.payload.comment.user.login;
-                activityDescription = anActivity.payload.comment.body;
-            } else if (anActivity.type == 'IssuesEvent') {
-                activityActor = anActivity.payload.issue.user.login;
-                activityDescription = anActivity.payload.issue.body;
-            } else if (anActivity.type == 'PullRequestEvent') {
-                activityActor = anActivity.payload.pull_request.user.login;
-                activityDescription = anActivity.payload.pull_request.title;
-            } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
-                activityActor = anActivity.payload.comment.user.login;
-                activityDescription = anActivity.payload.comment.body;
-            } else if (anActivity.type == 'PushEvent') {
-                activityActor = anActivity.payload.commits[0].author.email;
-                activityDescription = anActivity.payload.commits[0].message;
-            } else if (anActivity.type == 'CreateEvent') {
-                activityActor = '';
-                activityDescription = anActivity.payload.description;
+function addEventsFromOghliner() {
+    github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner', per_page: 100 }, function(err, activities) {
+        try {
+            if (err) {
+                throw new Error(err.message);
             }
 
-            if (anActivity.type) {
-                githubActivityData.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
-                githubActivity.setData(githubActivityData);                
+            for (var activityIndex in activities) {
+                var anActivity = activities[activityIndex];
+
+                var activityDescription = anActivity.type;
+                var activityActor = '';
+
+                if (anActivity.type == 'IssueCommentEvent') {
+                    activityActor = anActivity.payload.comment.user.login;
+                    activityDescription = anActivity.payload.comment.body;
+                } else if (anActivity.type == 'IssuesEvent') {
+                    activityActor = anActivity.payload.issue.user.login;
+                    activityDescription = anActivity.payload.issue.body;
+                } else if (anActivity.type == 'PullRequestEvent') {
+                    activityActor = anActivity.payload.pull_request.user.login;
+                    activityDescription = anActivity.payload.pull_request.title;
+                } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
+                    activityActor = anActivity.payload.comment.user.login;
+                    activityDescription = anActivity.payload.comment.body;
+                } else if (anActivity.type == 'PushEvent') {
+                    activityActor = anActivity.payload.commits[0].author.email;
+                    activityDescription = anActivity.payload.commits[0].message;
+                } else if (anActivity.type == 'CreateEvent') {
+                    activityActor = '';
+                    activityDescription = anActivity.payload.description;
+                }
+
+                if (anActivity.type) {
+                    activityTable.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
+                    activityWidget.setData(activityTable);                
+                }
             }
         }
-    }
-    catch(e) {
-        console.log('cannot parse events json', e);
-        console.log(e.stack);
-    }
-});
-
+        catch(e) {
+            console.log('cannot parse events json', e);
+            console.log(e.stack);
+        }
+    });
+}
 
 // on a recurring basis, update the display of random values and re-render
 
 setInterval(function() {
     screen.render();
-}, 5000);
+    activityTable.data = [];
+    addEventsFromOghliner();
+}, 10000);
