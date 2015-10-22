@@ -84,6 +84,7 @@ github.authenticate({
 // go find all the bugs we are tracking for WADI
 
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
+// TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
 request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response, body) {
     var tracker = JSON.parse(body);
@@ -106,9 +107,9 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
             }
 
             if (trackedBug.status == 'RESOLVED') {
-                bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status, trackedBug.summary));
+                bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
             } else {
-                bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status, trackedBug.summary));
+                bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
             }
             screen.render();
         });
