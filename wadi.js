@@ -105,7 +105,11 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
                 assignee = trackedBug.assigned_to;
             }
 
-            bugBox.insertBottom(util.format("%s {red-fg}%s{/} %s %s", trackedBug.id, assignee, trackedBug.status, trackedBug.summary));
+            if (trackedBug.status == 'RESOLVED') {
+                bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status, trackedBug.summary));
+            } else {
+                bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status, trackedBug.summary));
+            }
             screen.render();
         });
     }
