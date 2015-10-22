@@ -4,7 +4,67 @@
 var request = require('request');
 var GitHub = require("github");
 var blessed = require('blessed');
-var contrib = require('blessed-contrib');
+var util = require('util');
+
+// add lpad to string
+String.prototype.lpad = function(padString, length) {
+    var str = this;
+    while (str.length < length)
+        str = padString + str;
+    return str;
+}
+
+// Create a screen object.
+var screen = blessed.screen({
+  smartCSR: true
+});
+
+screen.title = 'my window title';
+
+// Create a box for activities.
+var activityBox = blessed.box({
+  top: 0,
+  left: 'center',
+  width: '95%',
+  height: '70%',
+  content: '{bold}Activity{/bold}!',
+  tags: true,
+  border: {
+    type: 'line'
+  },
+  style: {
+    fg: 'black',
+    bg: 'white',
+  }
+});
+
+// Create a box for bugzilla bugs.
+var bugBox = blessed.box({
+  top: '74%',
+  left: 'center',
+  width: '95%',
+  height: '25%',
+  content: '{bold}Bugs{/bold}!',
+  tags: true,
+  border: {
+    type: 'line'
+  },
+  style: {
+    fg: 'black',
+    bg: 'white',
+  }
+});
+
+// Append our box to the screen.
+screen.append(activityBox);
+screen.append(bugBox);
+
+// Quit on Escape, q, or Control-C.
+screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+  return process.exit(0);
+});
+
+screen.render();
 
 var github = new GitHub({
     // required 
@@ -16,60 +76,10 @@ var github = new GitHub({
     timeout: 5000
 });
 
-console.log();
-
 github.authenticate({
     type: "oauth",
     token: process.env.SEKRIT
 });
-
-// set up a grid with two rows and one column
-
-var screen = blessed.screen();
-var grid = new contrib.grid({rows: 2, cols: 2, screen: screen});
-
-// create a table for bugzilla bugs
-
-var bugList = grid.set(0, 0, 2, 1, contrib.table, {
-    keys: true,
-    fg: 'white',
-    label: 'wadi bugs',
-    columnWidth: [10, 20, 10, 150],
-    columnSpacing: 3
-});
-
-var bugListData = {
-    headers: ['id', 'assignee', 'status', 'title'],
-    data: [ ]
-};
-
-screen.append(bugList);
-bugList.setData(bugListData);
-
-// create table for github activity
-
-var activityWidget = grid.set(0, 1, 2, 1, contrib.table, {
-    keys: true,
-    fg: 'white',
-    label: 'github activity',
-    columnWidth: [10, 10, 150],
-    columnSpacing: 3
-});
-
-var activityTable = {
-    headers: ['date', 'actor', 'title'],
-    data: [ ]
-};
-
-screen.append(activityWidget);
-activityWidget.setData(activityTable);
-
-// make sure its possible to exit
-
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-    return process.exit(0);
-});
-
 
 // go find all the bugs we are tracking for WADI
 
@@ -90,13 +100,13 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
             // add info about that tracked bug to the table
             // NOTE: do not update the display now, it will get updated later
-            var assignee = '';
+            var assignee = 'nobody';
             if (trackedBug.assigned_to != 'nobody@mozilla.org') {
                 assignee = trackedBug.assigned_to;
             }
 
-            bugListData.data.push([trackedBug.id, assignee, trackedBug.status, trackedBug.summary]);
-            bugList.setData(bugListData);
+            bugBox.insertBottom(util.format("%s {red-fg}%s{/} %s %s", trackedBug.id, assignee, trackedBug.status, trackedBug.summary));
+            screen.render();
         });
     }
 
@@ -139,8 +149,8 @@ function addEventsFromOghliner() {
                 }
 
                 if (anActivity.type) {
-                    activityTable.data.push([anActivity.created_at.substring(0,10), activityActor, activityDescription]);
-                    activityWidget.setData(activityTable);                
+                    activityBox.insertBottom(util.format("%s {red-fg}%s{/} %s", anActivity.created_at.substring(0,10), activityActor.substring(0, 10).lpad(' ', 12), activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,150)));
+                    screen.render();
                 }
             }
         }
@@ -151,10 +161,4 @@ function addEventsFromOghliner() {
     });
 }
 
-// on a recurring basis, update the display of random values and re-render
-
-setInterval(function() {
-    screen.render();
-    activityTable.data = [];
-    addEventsFromOghliner();
-}, 10000);
+addEventsFromOghliner();
