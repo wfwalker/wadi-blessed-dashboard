@@ -156,19 +156,19 @@ function addEventsFromRepo(inRepoName) {
                 }
 
                 if (anActivity.type == 'IssueCommentEvent') {
-                    activityDescription = anActivity.payload.comment.body;
+                    activityDescription = '"' + anActivity.payload.comment.body + '"';
                 } else if (anActivity.type == 'IssuesEvent') {
-                    activityDescription = anActivity.payload.issue.body;
+                    activityDescription = 'Issue ' + anActivity.payload.issue.body;
                 } else if (anActivity.type == 'PullRequestEvent') {
-                    activityDescription = anActivity.payload.pull_request.title;
+                    activityDescription = 'PR ' + anActivity.payload.pull_request.title;
                 } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
-                    activityDescription = anActivity.payload.comment.body;
+                    activityDescription = 'Review ' + anActivity.payload.comment.body;
                 } else if (anActivity.type == 'PushEvent') {
-                    activityDescription = anActivity.payload.commits[0].message;
+                    activityDescription = 'Push ' + anActivity.payload.commits[0].message;
                 } else if (anActivity.type == 'CreateEvent') {
-                    activityDescription = anActivity.payload.description;
+                    activityDescription = 'Create ' + anActivity.payload.description;
                 } else if (anActivity.type == 'WatchEvent') {
-                    activityDescription = 'watch ' + inRepoName;
+                    activityDescription = 'Watch ' + inRepoName;
                 }
 
                 if (anActivity.type) {
