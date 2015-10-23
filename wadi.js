@@ -5,6 +5,7 @@ var request = require('request');
 var GitHub = require("github");
 var blessed = require('blessed');
 var util = require('util');
+var dashboard = require('./dashboard.js');
 
 var allEvents = {};
 var allBugs = {};
@@ -94,7 +95,7 @@ function addBugsTrackedBy(inBugID) {
     var tracker = JSON.parse(body);
     var depends_on_list = tracker.bugs[0].depends_on;
 
-    redrawBugs();
+    dashboard.redrawBugs(allBugs);
 
     // loop through the list of tracked bug ID's
     for (var bugIndex in depends_on_list) {
@@ -124,52 +125,20 @@ function addBugsTrackedBy(inBugID) {
             } else {
               formattedString = util.format("%s %s %s %s", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
               allBugs['' + trackedBug.id] = formattedString;          
-              redrawBugs();
+              dashboard.redrawBugs(allBugs);
             }
 
           }
         }
         catch (e) {
           allBugs['' + bugID] = bugID + ' error ' + e;   
-          redrawBugs();
+          dashboard.redrawBugs(allBugs);
         }
       });
 
-      redrawBugs();
+      dashboard.redrawBugs(allBugs);
     }
   });
-}
-
-function redrawEvents() {
-  activityBox.setContent('{bold}Activity{/bold}!');
-
-  var keys = Object.keys(allEvents);
-
-  keys.sort();
-  keys.reverse();
-
-  for (var index = 0; index <  keys.length; index++) {
-    var aKey = keys[index];
-    activityBox.insertBottom(allEvents[aKey]);
-  }
-
-  screen.render();
-}
-
-function redrawBugs() {
-  bugBox.setContent('{bold}Bugs{/bold}!');
-
-  var keys = Object.keys(allBugs);
-
-  keys.sort();
-  keys.reverse();
-
-  for (var index = 0; index <  keys.length; index++) {
-    var aKey = keys[index];
-    bugBox.insertBottom(allBugs[aKey]);
-  }
-
-  screen.render();
 }
 
 // go find all the activity for wadi repo's
@@ -227,7 +196,7 @@ function addEventsFromRepo(inRepoName) {
 
         allEvents[anActivity.created_at] = formattedString;
       }
-      redrawEvents();            
+      dashboard.redrawEvents(allEvents);
     }
     catch(e) {
       console.log('cannot parse events json', e);
