@@ -150,20 +150,24 @@ function addEventsFromRepo(inRepoName) {
 
                 var activityDescription = anActivity.type;
                 var activityActor = '';
+                var formattingString = "%s %s %s %s";
 
                 if (anActivity.actor) {
                   activityActor = anActivity.actor.login;
                 }
 
                 if (anActivity.type == 'IssueCommentEvent') {
+                    formattingString = "{cyan-fg}%s %s %s %s{/}";
                     activityDescription = '"' + anActivity.payload.comment.body + '"';
                 } else if (anActivity.type == 'IssuesEvent') {
                     activityDescription = 'Issue ' + anActivity.payload.issue.body;
                 } else if (anActivity.type == 'PullRequestEvent') {
                     activityDescription = 'PR ' + anActivity.payload.pull_request.title;
+                    formattingString = "{bold}%s %s %s %s{/}";
                 } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
                     activityDescription = 'Review ' + anActivity.payload.comment.body;
                 } else if (anActivity.type == 'PushEvent') {
+                    formattingString = "{blue-fg}%s %s %s %s{/}";
                     activityDescription = 'Push ' + anActivity.payload.commits[0].message;
                 } else if (anActivity.type == 'CreateEvent') {
                     activityDescription = 'Create ' + anActivity.payload.description;
@@ -173,7 +177,7 @@ function addEventsFromRepo(inRepoName) {
 
                 if (anActivity.type) {
                   var formattedString = util.format(
-                    "%s %s {red-fg}%s{/} %s",
+                    formattingString,
                     inRepoName.substring(0, 10).lpad(' ', 12),
                     anActivity.created_at.substring(0,10),
                     activityActor.substring(0, 10).lpad(' ', 12),
