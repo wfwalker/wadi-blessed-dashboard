@@ -36,7 +36,7 @@ var activityBox = blessed.box({
   },
   style: {
     fg: 'black',
-    bg: 'white',
+    bg: 'none',
   }
 });
 
@@ -53,7 +53,7 @@ var bugBox = blessed.box({
   },
   style: {
     fg: 'black',
-    bg: 'white',
+    bg: 'none',
   }
 });
 
@@ -151,26 +151,23 @@ function addEventsFromRepo(inRepoName) {
                 var activityDescription = anActivity.type;
                 var activityActor = '';
 
+                if (anActivity.actor) {
+                  activityActor = anActivity.actor.login;
+                }
+
                 if (anActivity.type == 'IssueCommentEvent') {
-                    activityActor = anActivity.payload.comment.user.login;
                     activityDescription = anActivity.payload.comment.body;
                 } else if (anActivity.type == 'IssuesEvent') {
-                    activityActor = anActivity.payload.issue.user.login;
                     activityDescription = anActivity.payload.issue.body;
                 } else if (anActivity.type == 'PullRequestEvent') {
-                    activityActor = anActivity.payload.pull_request.user.login;
                     activityDescription = anActivity.payload.pull_request.title;
                 } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
-                    activityActor = anActivity.payload.comment.user.login;
                     activityDescription = anActivity.payload.comment.body;
                 } else if (anActivity.type == 'PushEvent') {
-                    activityActor = anActivity.payload.commits[0].author.email;
                     activityDescription = anActivity.payload.commits[0].message;
                 } else if (anActivity.type == 'CreateEvent') {
-                    activityActor = '';
                     activityDescription = anActivity.payload.description;
                 } else if (anActivity.type == 'WatchEvent') {
-                    activityActor = anActivity.actor.login;
                     activityDescription = 'watch ' + inRepoName;
                 }
 
