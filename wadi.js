@@ -85,6 +85,21 @@ github.authenticate({
   token: process.env.SEKRIT
 });
 
+function formatForBugBox(trackedBug) {
+  var assignee = 'nobody';
+
+  if (trackedBug.assigned_to != 'nobody@mozilla.org') {
+    assignee = trackedBug.assigned_to;
+  }
+
+  return util.format("%s %s %s %s",
+    (''+trackedBug.id).lpad(' ', 7),
+    assignee.substring(0, 15).lpad(' ', 17),
+    trackedBug.status.lpad(' ', 10),
+    trackedBug.summary.substring(0,50)
+  );
+}
+
 // go find all the bugs we are tracking for WADI
 
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
@@ -94,8 +109,6 @@ function addBugsTrackedBy(inBugID) {
   request("http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
     var tracker = JSON.parse(body);
     var depends_on_list = tracker.bugs[0].depends_on;
-
-    dashboard.redrawBugs(allBugs);
 
     // loop through the list of tracked bug ID's
     for (var bugIndex in depends_on_list) {
@@ -110,24 +123,12 @@ function addBugsTrackedBy(inBugID) {
           if (parsedResult.bugs) {
             var trackedBug = parsedResult.bugs[0];
 
-
-            // add info about that tracked bug to the table
-            // NOTE: do not update the display now, it will get updated later
-            var assignee = 'nobody';
-            if (trackedBug.assigned_to != 'nobody@mozilla.org') {
-              assignee = trackedBug.assigned_to;
-            }
-
-            var formattedString = '';
-
             if (trackedBug.status == 'RESOLVED' || trackedBug.status == 'VERIFIED') {
               // do nothing
             } else {
-              formattedString = util.format("%s %s %s %s", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
-              allBugs['' + trackedBug.id] = formattedString;          
+              allBugs['' + trackedBug.id] = formatForBugBox(trackedBug);          
               dashboard.redrawBugs(allBugs);
             }
-
           }
         }
         catch (e) {
@@ -135,8 +136,6 @@ function addBugsTrackedBy(inBugID) {
           dashboard.redrawBugs(allBugs);
         }
       });
-
-      dashboard.redrawBugs(allBugs);
     }
   });
 }
