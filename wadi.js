@@ -27,8 +27,8 @@ screen.title = 'my window title';
 var activityBox = blessed.box({
   top: 0,
   left: 'center',
-  width: '95%',
-  height: '70%',
+  width: '99%',
+  height: '74%',
   content: '{bold}Activity{/bold}!',
   tags: true,
   border: {
@@ -44,7 +44,7 @@ var activityBox = blessed.box({
 var bugBox = blessed.box({
   top: '74%',
   left: 'center',
-  width: '95%',
+  width: '99%',
   height: '25%',
   content: '{bold}Bugs{/bold}!',
   tags: true,
@@ -120,7 +120,7 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 });
 
 function redrawEvents() {
-  activityBox.setContent('');
+  activityBox.setContent('{bold}Activity{/bold}!');
 
   var keys = Object.keys(allEvents);
 
@@ -169,6 +169,9 @@ function addEventsFromRepo(inRepoName) {
                 } else if (anActivity.type == 'CreateEvent') {
                     activityActor = '';
                     activityDescription = anActivity.payload.description;
+                } else if (anActivity.type == 'WatchEvent') {
+                    activityActor = anActivity.actor.login;
+                    activityDescription = 'watch ' + inRepoName;
                 }
 
                 if (anActivity.type) {
