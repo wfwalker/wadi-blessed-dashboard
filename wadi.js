@@ -10,10 +10,10 @@ var allEvents = {};
 
 // add lpad to string
 String.prototype.lpad = function(padString, length) {
-    var str = this;
-    while (str.length < length)
-        str = padString + str;
-    return str;
+  var str = this;
+  while (str.length < length)
+    str = padString + str;
+  return str;
 }
 
 // Create a screen object.
@@ -21,7 +21,7 @@ var screen = blessed.screen({
   smartCSR: true
 });
 
-screen.title = 'my window title';
+screen.title = 'WADI activity';
 
 // Create a box for activities.
 var activityBox = blessed.box({
@@ -76,11 +76,11 @@ var github = new GitHub({
     protocol: "https",
     host: "api.github.com",
     timeout: 5000
-});
+  });
 
 github.authenticate({
-    type: "oauth",
-    token: process.env.SEKRIT
+  type: "oauth",
+  token: process.env.SEKRIT
 });
 
 // go find all the bugs we are tracking for WADI
@@ -89,34 +89,33 @@ github.authenticate({
 // TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
 request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response, body) {
-    var tracker = JSON.parse(body);
-    var depends_on_list = tracker.bugs[0].depends_on;
+  var tracker = JSON.parse(body);
+  var depends_on_list = tracker.bugs[0].depends_on;
 
-    // loop through the list of tracked bug ID's
-    for (var bugIndex in depends_on_list) {
-        var bugID = depends_on_list[bugIndex];
+  // loop through the list of tracked bug ID's
+  for (var bugIndex in depends_on_list) {
+    var bugID = depends_on_list[bugIndex];
 
-        // and for each tracked bug ID, go find info for that bug
+    // and for each tracked bug ID, go find info for that bug
 
-        request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex], function(error, response, body) {
-            var trackedBug = JSON.parse(body).bugs[0];
+    request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex], function(error, response, body) {
+      var trackedBug = JSON.parse(body).bugs[0];
 
-            // add info about that tracked bug to the table
-            // NOTE: do not update the display now, it will get updated later
-            var assignee = 'nobody';
-            if (trackedBug.assigned_to != 'nobody@mozilla.org') {
-                assignee = trackedBug.assigned_to;
-            }
+      // add info about that tracked bug to the table
+      // NOTE: do not update the display now, it will get updated later
+      var assignee = 'nobody';
+      if (trackedBug.assigned_to != 'nobody@mozilla.org') {
+        assignee = trackedBug.assigned_to;
+      }
 
-            if (trackedBug.status == 'RESOLVED') {
-                bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
-            } else {
-                bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
-            }
-            screen.render();
-        });
-    }
-
+      if (trackedBug.status == 'RESOLVED') {
+        bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
+      } else {
+        bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
+      }
+      screen.render();
+    });
+  }
 });
 
 function redrawEvents() {
@@ -139,61 +138,61 @@ function redrawEvents() {
 
 // TODO: combine multiple event streams sort by date
 function addEventsFromRepo(inRepoName) {
-    github.events.getFromRepo( { 'user': 'mozilla', 'repo': inRepoName, per_page: 100 }, function(err, activities) {
-        try {
-            if (err) {
-                throw new Error(err.message);
-            }
+  github.events.getFromRepo( { 'user': 'mozilla', 'repo': inRepoName, per_page: 100 }, function(err, activities) {
+    try {
+      if (err) {
+        throw new Error(err.message);
+      }
 
-            for (var activityIndex in activities) {
-                var anActivity = activities[activityIndex];
+      for (var activityIndex in activities) {
+        var anActivity = activities[activityIndex];
 
-                var activityDescription = anActivity.type;
-                var activityActor = '';
-                var formattingString = "%s %s %s %s";
+        var activityDescription = anActivity.type;
+        var activityActor = '';
+        var formattingString = "%s %s %s %s";
 
-                if (anActivity.actor) {
-                  activityActor = anActivity.actor.login;
-                }
-
-                if (anActivity.type == 'IssueCommentEvent') {
-                    formattingString = "{cyan-fg}%s %s %s %s{/}";
-                    activityDescription = '"' + anActivity.payload.comment.body + '"';
-                } else if (anActivity.type == 'IssuesEvent') {
-                    activityDescription = 'Issue ' + anActivity.payload.issue.body;
-                } else if (anActivity.type == 'PullRequestEvent') {
-                    activityDescription = 'PR ' + anActivity.payload.pull_request.title;
-                    formattingString = "{bold}%s %s %s %s{/}";
-                } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
-                    activityDescription = 'Review ' + anActivity.payload.comment.body;
-                } else if (anActivity.type == 'PushEvent') {
-                    formattingString = "{blue-fg}%s %s %s %s{/}";
-                    activityDescription = 'Push ' + anActivity.payload.commits[0].message;
-                } else if (anActivity.type == 'CreateEvent') {
-                    activityDescription = 'Create ' + anActivity.payload.description;
-                } else if (anActivity.type == 'WatchEvent') {
-                    activityDescription = 'Watch ' + inRepoName;
-                }
-
-                if (anActivity.type) {
-                  var formattedString = util.format(
-                    formattingString,
-                    inRepoName.substring(0, 10).lpad(' ', 12),
-                    anActivity.created_at.substring(0,10),
-                    activityActor.substring(0, 10).lpad(' ', 12),
-                    activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,130)
-                  );
-
-                  allEvents[anActivity.created_at] = formattedString;
-                }
-            }
-            redrawEvents();            
+        if (anActivity.actor) {
+          activityActor = anActivity.actor.login;
         }
-        catch(e) {
-            console.log('cannot parse events json', e);
-            console.log(e.stack);
+
+        if (anActivity.type == 'IssueCommentEvent') {
+          formattingString = "{cyan-fg}%s %s %s %s{/}";
+          activityDescription = '"' + anActivity.payload.comment.body + '"';
+        } else if (anActivity.type == 'IssuesEvent') {
+          activityDescription = 'Issue ' + anActivity.payload.issue.body;
+        } else if (anActivity.type == 'PullRequestEvent') {
+          activityDescription = 'PR ' + anActivity.payload.pull_request.title;
+          formattingString = "{bold}%s %s %s %s{/}";
+        } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
+          activityDescription = 'Review ' + anActivity.payload.comment.body;
+        } else if (anActivity.type == 'PushEvent') {
+          formattingString = "{blue-fg}%s %s %s %s{/}";
+          activityDescription = 'Push ' + anActivity.payload.commits[0].message;
+        } else if (anActivity.type == 'CreateEvent') {
+          activityDescription = 'Create ' + anActivity.payload.description;
+        } else if (anActivity.type == 'WatchEvent') {
+          activityDescription = 'Watch ' + inRepoName;
         }
-    });
+
+        if (anActivity.type) {
+          var formattedString = util.format(
+            formattingString,
+            inRepoName.substring(0, 10).lpad(' ', 12),
+            anActivity.created_at.substring(0,10),
+            activityActor.substring(0, 10).lpad(' ', 12),
+            activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,130)
+            );
+
+          allEvents[anActivity.created_at] = formattedString;
+        }
+      }
+      redrawEvents();            
+    }
+    catch(e) {
+      console.log('cannot parse events json', e);
+      console.log(e.stack);
+    }
+  });
 }
 
 addEventsFromRepo('oghliner');
