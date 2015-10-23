@@ -76,7 +76,7 @@ var github = new GitHub({
     debug: false,
     protocol: "https",
     host: "api.github.com",
-    timeout: 15000
+    timeout: 30000
   });
 
 github.authenticate({
@@ -97,7 +97,7 @@ function addBugsTrackedBy(inBugID) {
     // loop through the list of tracked bug ID's
     for (var bugIndex in depends_on_list) {
       var bugID = depends_on_list[bugIndex];
-      allBugs['' + bugID] = bugID + ' pending';                
+      allBugs['' + bugID] = ('' + bugID).lpad(' ', 7) + ' pending';
     }
 
     redrawBugs();
@@ -126,9 +126,9 @@ function addBugsTrackedBy(inBugID) {
             var formattedString = '';
 
             if (trackedBug.status == 'RESOLVED') {
-              formattedString = util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+              formattedString = util.format("{green-fg}%s %s %s %s{/}", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
             } else {
-              formattedString = util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+              formattedString = util.format("{red-fg}%s %s %s %s{/}", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
             }
 
             allBugs['' + trackedBug.id] = formattedString;          
@@ -227,8 +227,11 @@ function addEventsFromRepo(inRepoName) {
             activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,50)
           );
 
-          allEvents[anActivity.created_at] = formattedString;
+        } else if (anActivity["x-ratelimit-limit"]) {
+          var formattedString = 'rate limit ' + anActivity["x-ratelimit-remaining"] + ' ' + anActivity["x-ratelimit-limit"];
         }
+
+        allEvents[anActivity.created_at] = formattedString;
       }
       redrawEvents();            
     }
