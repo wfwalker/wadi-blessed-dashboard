@@ -141,9 +141,50 @@ function addBugsTrackedBy(inBugID) {
   });
 }
 
-// go find all the activity for wadi repo's
+function formatForEventBox(inRepoName, anActivity) {
+  var activityDescription = anActivity.type;
+  var activityActor = '';
+  var formattingString = "%s %s %s %s";
 
-// TODO: combine multiple event streams sort by date
+  if (anActivity.actor) {
+    activityActor = anActivity.actor.login;
+  }
+
+  if (anActivity.type == 'IssueCommentEvent') {
+    formattingString = "{cyan-fg}%s %s %s %s{/}";
+    activityDescription = '"' + anActivity.payload.comment.body + '"';
+  } else if (anActivity.type == 'IssuesEvent') {
+    activityDescription = 'Issue ' + anActivity.payload.issue.body;
+  } else if (anActivity.type == 'PullRequestEvent') {
+    activityDescription = 'PR ' + anActivity.payload.pull_request.title;
+    formattingString = "{bold}%s %s %s %s{/}";
+  } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
+    activityDescription = 'Review ' + anActivity.payload.comment.body;
+  } else if (anActivity.type == 'PushEvent') {
+    formattingString = "{blue-fg}%s %s %s %s{/}";
+    activityDescription = 'Push ' + anActivity.payload.commits[0].message;
+  } else if (anActivity.type == 'CreateEvent') {
+    activityDescription = 'Create ' + anActivity.payload.description;
+  } else if (anActivity.type == 'WatchEvent') {
+    activityDescription = 'Watch ' + inRepoName;
+  }
+
+  if (anActivity.type) {
+    var formattedString = util.format(
+      formattingString,
+      inRepoName.substring(0, 10).lpad(' ', 12),
+      anActivity.created_at.substring(0,10),
+      activityActor.substring(0, 10).lpad(' ', 12),
+      activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,50)
+    );
+
+  } else if (anActivity["x-ratelimit-limit"]) {
+    var formattedString = 'rate limit ' + anActivity["x-ratelimit-remaining"] + ' ' + anActivity["x-ratelimit-limit"];
+  }
+
+  return formattedString;  
+}
+
 function addEventsFromRepo(inRepoName) {
   github.events.getFromRepo( { 'user': 'mozilla', 'repo': inRepoName, per_page: 100 }, function(err, activities) {
     try {
@@ -153,48 +194,7 @@ function addEventsFromRepo(inRepoName) {
 
       for (var activityIndex in activities) {
         var anActivity = activities[activityIndex];
-
-        var activityDescription = anActivity.type;
-        var activityActor = '';
-        var formattingString = "%s %s %s %s";
-
-        if (anActivity.actor) {
-          activityActor = anActivity.actor.login;
-        }
-
-        if (anActivity.type == 'IssueCommentEvent') {
-          formattingString = "{cyan-fg}%s %s %s %s{/}";
-          activityDescription = '"' + anActivity.payload.comment.body + '"';
-        } else if (anActivity.type == 'IssuesEvent') {
-          activityDescription = 'Issue ' + anActivity.payload.issue.body;
-        } else if (anActivity.type == 'PullRequestEvent') {
-          activityDescription = 'PR ' + anActivity.payload.pull_request.title;
-          formattingString = "{bold}%s %s %s %s{/}";
-        } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
-          activityDescription = 'Review ' + anActivity.payload.comment.body;
-        } else if (anActivity.type == 'PushEvent') {
-          formattingString = "{blue-fg}%s %s %s %s{/}";
-          activityDescription = 'Push ' + anActivity.payload.commits[0].message;
-        } else if (anActivity.type == 'CreateEvent') {
-          activityDescription = 'Create ' + anActivity.payload.description;
-        } else if (anActivity.type == 'WatchEvent') {
-          activityDescription = 'Watch ' + inRepoName;
-        }
-
-        if (anActivity.type) {
-          var formattedString = util.format(
-            formattingString,
-            inRepoName.substring(0, 10).lpad(' ', 12),
-            anActivity.created_at.substring(0,10),
-            activityActor.substring(0, 10).lpad(' ', 12),
-            activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,50)
-          );
-
-        } else if (anActivity["x-ratelimit-limit"]) {
-          var formattedString = 'rate limit ' + anActivity["x-ratelimit-remaining"] + ' ' + anActivity["x-ratelimit-limit"];
-        }
-
-        allEvents[anActivity.created_at] = formattedString;
+        allEvents[anActivity.created_at] = formatForEventBox(inRepoName, anActivity);
       }
       dashboard.redrawEvents(allEvents);
     }
@@ -204,6 +204,8 @@ function addEventsFromRepo(inRepoName) {
     }
   });
 }
+
+// go find all the activity for wadi repo's
 
 addEventsFromRepo('oghliner');
 addEventsFromRepo('platatus');
