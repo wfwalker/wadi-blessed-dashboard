@@ -94,12 +94,6 @@ function addBugsTrackedBy(inBugID) {
     var tracker = JSON.parse(body);
     var depends_on_list = tracker.bugs[0].depends_on;
 
-    // loop through the list of tracked bug ID's
-    for (var bugIndex in depends_on_list) {
-      var bugID = depends_on_list[bugIndex];
-      allBugs['' + bugID] = ('' + bugID).lpad(' ', 7) + ' pending';
-    }
-
     redrawBugs();
 
     // loop through the list of tracked bug ID's
@@ -125,14 +119,14 @@ function addBugsTrackedBy(inBugID) {
 
             var formattedString = '';
 
-            if (trackedBug.status == 'RESOLVED') {
-              formattedString = util.format("{green-fg}%s %s %s %s{/}", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+            if (trackedBug.status == 'RESOLVED' || trackedBug.status == 'VERIFIED') {
+              // do nothing
             } else {
-              formattedString = util.format("{red-fg}%s %s %s %s{/}", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+              formattedString = util.format("%s %s %s %s", (''+trackedBug.id).lpad(' ', 7), assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+              allBugs['' + trackedBug.id] = formattedString;          
+              redrawBugs();
             }
 
-            allBugs['' + trackedBug.id] = formattedString;          
-            redrawBugs();
           }
         }
         catch (e) {
