@@ -7,6 +7,7 @@ var blessed = require('blessed');
 var util = require('util');
 
 var allEvents = {};
+var allBugs = {};
 
 // add lpad to string
 String.prototype.lpad = function(padString, length) {
@@ -26,9 +27,9 @@ screen.title = 'WADI activity';
 // Create a box for activities.
 var activityBox = blessed.box({
   top: 0,
-  left: 'center',
-  width: '99%',
-  height: '74%',
+  left: 0,
+  width: '49%',
+  height: '99%',
   content: '{bold}Activity{/bold}!',
   tags: true,
   border: {
@@ -42,10 +43,10 @@ var activityBox = blessed.box({
 
 // Create a box for bugzilla bugs.
 var bugBox = blessed.box({
-  top: '74%',
-  left: 'center',
-  width: '99%',
-  height: '25%',
+  top: 0,
+  left: '50%',
+  width: '49%',
+  height: '99%',
   content: '{bold}Bugs{/bold}!',
   tags: true,
   border: {
@@ -75,7 +76,7 @@ var github = new GitHub({
     debug: false,
     protocol: "https",
     host: "api.github.com",
-    timeout: 5000
+    timeout: 15000
   });
 
 github.authenticate({
@@ -88,35 +89,62 @@ github.authenticate({
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
 // TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
-request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response, body) {
-  var tracker = JSON.parse(body);
-  var depends_on_list = tracker.bugs[0].depends_on;
+function addBugsTrackedBy(inBugID) {
+  request("http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
+    var tracker = JSON.parse(body);
+    var depends_on_list = tracker.bugs[0].depends_on;
 
-  // loop through the list of tracked bug ID's
-  for (var bugIndex in depends_on_list) {
-    var bugID = depends_on_list[bugIndex];
+    // loop through the list of tracked bug ID's
+    for (var bugIndex in depends_on_list) {
+      var bugID = depends_on_list[bugIndex];
+      allBugs['' + bugID] = bugID + ' pending';                
+    }
 
-    // and for each tracked bug ID, go find info for that bug
+    redrawBugs();
 
-    request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex], function(error, response, body) {
-      var trackedBug = JSON.parse(body).bugs[0];
+    // loop through the list of tracked bug ID's
+    for (var bugIndex in depends_on_list) {
+      var bugID = depends_on_list[bugIndex];
 
-      // add info about that tracked bug to the table
-      // NOTE: do not update the display now, it will get updated later
-      var assignee = 'nobody';
-      if (trackedBug.assigned_to != 'nobody@mozilla.org') {
-        assignee = trackedBug.assigned_to;
-      }
+      // and for each tracked bug ID, go find info for that bug
 
-      if (trackedBug.status == 'RESOLVED') {
-        bugBox.insertBottom(util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
-      } else {
-        bugBox.insertBottom(util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary));
-      }
-      screen.render();
-    });
-  }
-});
+      request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "?include_fields=id,status,summary,assigned_to", function(error, response, body) {
+        try {
+          var parsedResult = JSON.parse(body);
+
+          if (parsedResult.bugs) {
+            var trackedBug = parsedResult.bugs[0];
+
+
+            // add info about that tracked bug to the table
+            // NOTE: do not update the display now, it will get updated later
+            var assignee = 'nobody';
+            if (trackedBug.assigned_to != 'nobody@mozilla.org') {
+              assignee = trackedBug.assigned_to;
+            }
+
+            var formattedString = '';
+
+            if (trackedBug.status == 'RESOLVED') {
+              formattedString = util.format("{green-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+            } else {
+              formattedString = util.format("{red-fg}%s %s %s %s{/}", trackedBug.id, assignee.substring(0, 15).lpad(' ', 17), trackedBug.status.lpad(' ', 10), trackedBug.summary.substring(0,50));
+            }
+
+            allBugs['' + trackedBug.id] = formattedString;          
+            redrawBugs();
+          }
+        }
+        catch (e) {
+          allBugs['' + bugID] = bugID + ' error ' + e;   
+          redrawBugs();
+        }
+      });
+
+      redrawBugs();
+    }
+  });
+}
 
 function redrawEvents() {
   activityBox.setContent('{bold}Activity{/bold}!');
@@ -129,6 +157,22 @@ function redrawEvents() {
   for (var index = 0; index <  keys.length; index++) {
     var aKey = keys[index];
     activityBox.insertBottom(allEvents[aKey]);
+  }
+
+  screen.render();
+}
+
+function redrawBugs() {
+  bugBox.setContent('{bold}Bugs{/bold}!');
+
+  var keys = Object.keys(allBugs);
+
+  keys.sort();
+  keys.reverse();
+
+  for (var index = 0; index <  keys.length; index++) {
+    var aKey = keys[index];
+    bugBox.insertBottom(allBugs[aKey]);
   }
 
   screen.render();
@@ -180,8 +224,8 @@ function addEventsFromRepo(inRepoName) {
             inRepoName.substring(0, 10).lpad(' ', 12),
             anActivity.created_at.substring(0,10),
             activityActor.substring(0, 10).lpad(' ', 12),
-            activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,130)
-            );
+            activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,50)
+          );
 
           allEvents[anActivity.created_at] = formattedString;
         }
@@ -198,3 +242,7 @@ function addEventsFromRepo(inRepoName) {
 addEventsFromRepo('oghliner');
 addEventsFromRepo('platatus');
 addEventsFromRepo('serviceworker-cookbook');
+
+addBugsTrackedBy(1201717);
+addBugsTrackedBy(1059784);
+
