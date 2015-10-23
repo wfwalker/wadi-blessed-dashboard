@@ -6,6 +6,8 @@ var GitHub = require("github");
 var blessed = require('blessed');
 var util = require('util');
 
+var allEvents = {};
+
 // add lpad to string
 String.prototype.lpad = function(padString, length) {
     var str = this;
@@ -117,11 +119,27 @@ request("http://bugzilla.mozilla.org/rest/bug/1201717", function(error, response
 
 });
 
+function redrawEvents() {
+  activityBox.setContent('');
+
+  var keys = Object.keys(allEvents);
+
+  keys.sort();
+  keys.reverse();
+
+  for (var index = 0; index <  keys.length; index++) {
+    var aKey = keys[index];
+    activityBox.insertBottom(allEvents[aKey]);
+  }
+
+  screen.render();
+}
+
 // go find all the activity for wadi repo's
 
 // TODO: combine multiple event streams sort by date
-function addEventsFromOghliner() {
-    github.events.getFromRepo( { 'user': 'mozilla', 'repo': 'oghliner', per_page: 100 }, function(err, activities) {
+function addEventsFromRepo(inRepoName) {
+    github.events.getFromRepo( { 'user': 'mozilla', 'repo': inRepoName, per_page: 100 }, function(err, activities) {
         try {
             if (err) {
                 throw new Error(err.message);
@@ -154,10 +172,18 @@ function addEventsFromOghliner() {
                 }
 
                 if (anActivity.type) {
-                    activityBox.insertBottom(util.format("%s {red-fg}%s{/} %s", anActivity.created_at.substring(0,10), activityActor.substring(0, 10).lpad(' ', 12), activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,150)));
-                    screen.render();
+                  var formattedString = util.format(
+                    "%s %s {red-fg}%s{/} %s",
+                    inRepoName.substring(0, 10).lpad(' ', 12),
+                    anActivity.created_at.substring(0,10),
+                    activityActor.substring(0, 10).lpad(' ', 12),
+                    activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,130)
+                  );
+
+                  allEvents[anActivity.created_at] = formattedString;
                 }
             }
+            redrawEvents();            
         }
         catch(e) {
             console.log('cannot parse events json', e);
@@ -166,4 +192,6 @@ function addEventsFromOghliner() {
     });
 }
 
-addEventsFromOghliner();
+addEventsFromRepo('oghliner');
+addEventsFromRepo('platatus');
+addEventsFromRepo('serviceworker-cookbook');
