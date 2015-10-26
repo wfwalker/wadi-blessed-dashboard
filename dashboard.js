@@ -110,6 +110,21 @@ function formatForEventBox(inRepoName, anActivity) {
   return formattedString;  
 }
 
+function formatForBugBox(trackedBug) {
+  var assignee = 'nobody';
+
+  if (trackedBug.assigned_to != 'nobody@mozilla.org') {
+    assignee = trackedBug.assigned_to;
+  }
+
+  return util.format("%s %s %s %s",
+    (''+trackedBug.id).lpad(' ', 7),
+    assignee.substring(0, 15).lpad(' ', 17),
+    trackedBug.status.lpad(' ', 10),
+    trackedBug.summary.substring(0,50)
+  );
+}
+
 function redrawEvents(inEvents) {
   activityBox.setContent('{bold}Activity{/bold}!');
 
@@ -145,4 +160,5 @@ function redrawBugs(inBugs) {
 module.exports.redrawEvents = redrawEvents;
 module.exports.redrawBugs = redrawBugs;
 module.exports.formatForEventBox = formatForEventBox;
+module.exports.formatForBugBox = formatForBugBox;
 
