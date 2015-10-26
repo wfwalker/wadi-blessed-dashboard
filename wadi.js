@@ -6,6 +6,7 @@ var GitHub = require("github");
 var blessed = require('blessed');
 var util = require('util');
 var dashboard = require('./dashboard.js');
+var screen = null;
 
 var allEvents = {};
 var allBugs = {};
@@ -18,57 +19,59 @@ String.prototype.lpad = function(padString, length) {
   return str;
 }
 
-// Create a screen object.
-var screen = blessed.screen({
-  smartCSR: true
-});
+function initializeBlessedDashboard() {
+  // Create a screen object.
+  screen = blessed.screen({
+    smartCSR: true
+  });
 
-screen.title = 'WADI activity';
+  screen.title = 'WADI activity';
 
-// Create a box for activities.
-var activityBox = blessed.box({
-  top: 0,
-  left: 0,
-  width: '49%',
-  height: '99%',
-  content: '{bold}Activity{/bold}!',
-  tags: true,
-  border: {
-    type: 'line'
-  },
-  style: {
-    fg: 'black',
-    bg: 'none',
-  }
-});
+  // Create a box for activities.
+  var activityBox = blessed.box({
+    top: 0,
+    left: 0,
+    width: '49%',
+    height: '99%',
+    content: '{bold}Activity{/bold}!',
+    tags: true,
+    border: {
+      type: 'line'
+    },
+    style: {
+      fg: 'black',
+      bg: 'none',
+    }
+  });
 
-// Create a box for bugzilla bugs.
-var bugBox = blessed.box({
-  top: 0,
-  left: '50%',
-  width: '49%',
-  height: '99%',
-  content: '{bold}Bugs{/bold}!',
-  tags: true,
-  border: {
-    type: 'line'
-  },
-  style: {
-    fg: 'black',
-    bg: 'none',
-  }
-});
+  // Create a box for bugzilla bugs.
+  var bugBox = blessed.box({
+    top: 0,
+    left: '50%',
+    width: '49%',
+    height: '99%',
+    content: '{bold}Bugs{/bold}!',
+    tags: true,
+    border: {
+      type: 'line'
+    },
+    style: {
+      fg: 'black',
+      bg: 'none',
+    }
+  });
 
-// Append our box to the screen.
-screen.append(activityBox);
-screen.append(bugBox);
+  // Append our box to the screen.
+  screen.append(activityBox);
+  screen.append(bugBox);
 
-// Quit on Escape, q, or Control-C.
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-  return process.exit(0);
-});
+  // Quit on Escape, q, or Control-C.
+  screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+    return process.exit(0);
+  });
 
-screen.render();
+  screen.render();
+}
 
 var github = new GitHub({
     // required 
@@ -154,3 +157,4 @@ addEventsFromRepo('serviceworker-cookbook');
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
 
+initializeBlessedDashboard();
