@@ -33,6 +33,9 @@ github.authenticate({
 
 function addBugsTrackedBy(inBugID) {
   request("http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
+    if (error) {
+      throw new Error(error); 
+    }
     var tracker = JSON.parse(body);
     var depends_on_list = tracker.bugs[0].depends_on;
 
@@ -52,16 +55,24 @@ function addBugsTrackedBy(inBugID) {
           var attachmentBugList = Object.keys(parsedResult.bugs);
 
           if (attachmentBugList.length > 0) {
-            allAttachmentData[attachmentBugList[0]] = parsedResult;
+            var tmpBugID = attachmentBugList[0];
+            if (parsedResult.bugs[tmpBugID].length > 0) {
+              allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
+            }
           }      
         }
         catch (e) {
-          // console.log(e);
+          // allBugSummaries['' + Date.now()] = 'error ' + e;   
+          // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
         }
       });
 
       request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "?include_fields=id,status,summary,assigned_to", function(error, response, body) {
         try {
+          if (error) {
+            throw new Error(error); 
+          }
+
           var parsedResult = JSON.parse(body);
 
           if (parsedResult.bugs) {
@@ -80,8 +91,8 @@ function addBugsTrackedBy(inBugID) {
           }
         }
         catch (e) {
-          allBugSummaries['' + bugID] = bugID + ' error ' + e;   
-          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+          // allBugSummaries['' + Date.now()] = 'error ' + e;   
+          // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
         }
       });
     } /* for */
