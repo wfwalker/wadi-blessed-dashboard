@@ -115,18 +115,24 @@ function formatForEventBox(inRepoName, anActivity) {
   return formattedString;  
 }
 
-function formatForBugBox(trackedBug) {
+function formatForBugBox(trackedBug, attachmentData) {
   var assignee = 'nobody';
+
+  var attachmentString = '';
 
   if (trackedBug.assigned_to != 'nobody@mozilla.org') {
     assignee = trackedBug.assigned_to;
+  }
+
+  if (attachmentData) {
+    attachmentString = 'MOO';
   }
 
   return util.format("%s %s %s %s",
     (''+trackedBug.id).lpad(' ', 7),
     assignee.substring(0, 15).lpad(' ', 17),
     trackedBug.status.lpad(' ', 10),
-    trackedBug.summary.substring(0,50)
+    attachmentString + ' ' + trackedBug.summary.substring(0,50)
   );
 }
 
