@@ -137,7 +137,6 @@ function formatForEventBox(inRepoName, anActivity) {
 
 function formatForBugBox(trackedBug, attachmentData) {
   var assignee = 'nobody';
-
   var attachmentString = '';
 
   if (trackedBug.assigned_to != 'nobody@mozilla.org') {

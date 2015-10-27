@@ -38,15 +38,28 @@ function addAttachmentInfo(inBugID) {
       if (error) {
         throw new Error(error); 
       }
+
+      // try to parse the response and find the list of bugs
       var parsedResult = JSON.parse(body);
       var attachmentBugList = Object.keys(parsedResult.bugs);
 
+      // if this attachments info includes a non-empty list of bugs ...
       if (attachmentBugList.length > 0) {
+        // ... use the first one
         var tmpBugID = attachmentBugList[0];
+
+        // ... if that first bug has a non-zero list of attachments 
         if (parsedResult.bugs[tmpBugID].length > 0) {
+          // store them in the global dictionary
           allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
-          allBugSummaries[tmpBugID] = dashboard.formatForBugBox(allBugData[tmpBugID], parsedResult.bugs[tmpBugID]);
-          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+
+          // if we already have the bug details, go redo the summary
+          if (allBugData[tmpBugID]) {
+            allBugSummaries[tmpBugID] = dashboard.formatForBugBox(allBugData[tmpBugID], parsedResult.bugs[tmpBugID]);
+            dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);            
+          }
+
+          // log about it
           dashboard.logString(tmpBugID, parsedResult.bugs[tmpBugID]);
         }
       }      
