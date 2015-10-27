@@ -47,12 +47,12 @@ function addAttachmentInfo(inBugID) {
           allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
           allBugSummaries[tmpBugID] = dashboard.formatForBugBox(trackedBug, parsedResult.bugs[tmpBugID]);
           dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+          dashboard.logString(tmpBugID, parsedResult.bugs[tmpBugID]);
         }
       }      
     }
     catch (e) {
-      // allBugSummaries['' + Date.now()] = 'error ' + e;   
-      // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+      dashboard.logString(inBugID + ' attachment error: ' + e);
     }
   });
 }
@@ -80,11 +80,12 @@ function addBugDetails(inBugID) {
       } else {
         // missing buglist!
         allBugSummaries['' + bugID] = bugID + ' missing bug info';   
+        dashboard.logString(bugId + ' missing bug info');
       }
     }
     catch (e) {
-      // allBugSummaries['' + Date.now()] = 'error ' + e;   
-      // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+      allBugSummaries['' + inBugID] = inBugID + ' details error: ' + e;   
+      dashboard.logString(inBugID + ' details error: ' + e);
     }
   });
 }
@@ -94,16 +95,22 @@ function addBugsTrackedBy(inBugID) {
     if (error) {
       throw new Error(error); 
     }
-    var tracker = JSON.parse(body);
-    var depends_on_list = tracker.bugs[0].depends_on;
 
-    // loop through the list of tracked bug ID's
-    for (var bugIndex in depends_on_list) {
-      var bugID = depends_on_list[bugIndex];
+    try {
+      var tracker = JSON.parse(body);
+      var depends_on_list = tracker.bugs[0].depends_on;
 
-      // and for each tracked bug ID, go find info for that bug
-      addAttachmentInfo(bugID);
-      addBugDetails(bugID);
+      // loop through the list of tracked bug ID's
+      for (var bugIndex in depends_on_list) {
+        var bugID = depends_on_list[bugIndex];
+
+        // and for each tracked bug ID, go find info for that bug
+        addAttachmentInfo(bugID);
+        addBugDetails(bugID);
+      }      
+    }
+    catch (e) {
+      dashboard.logString('cannot parse tracker ' + e);
     }
   });
 }
@@ -122,13 +129,17 @@ function addEventsFromRepo(inRepoName) {
       dashboard.redrawEvents(allEvents);
     }
     catch(e) {
-      console.log('cannot parse events json', e);
-      console.log(e.stack);
+      dashboard.logString('cannot parse events json ' + e);
+      dashboard.logString(e.stack);
     }
   });
 }
 
 // go find all the activity for wadi repo's
+
+dashboard.initializeBlessedDashboard();
+
+dashboard.logString('starting');
 
 addEventsFromRepo('oghliner');
 addEventsFromRepo('platatus');
@@ -137,4 +148,5 @@ addEventsFromRepo('serviceworker-cookbook');
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
 
-dashboard.initializeBlessedDashboard();
+dashboard.logString('done starting');
+

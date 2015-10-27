@@ -8,6 +8,7 @@ var screen = null;
 var util = require('util');
 var bugBox = null;
 var activityBox = null;
+var logBox = null;
 
 // add lpad to string
 String.prototype.lpad = function(padString, length) {
@@ -47,7 +48,7 @@ function initializeBlessedDashboard() {
     top: 0,
     left: '50%',
     width: '49%',
-    height: '99%',
+    height: '49%',
     content: '{bold}Bugs{/bold}!',
     tags: true,
     border: {
@@ -59,9 +60,28 @@ function initializeBlessedDashboard() {
     }
   });
 
+  // Create a box for logging.
+  logBox = blessed.box({
+    top: '50%',
+    left: '50%',
+    width: '49%',
+    height: '50%',
+    content: '{bold}Log{/bold}!',
+    tags: true,
+    border: {
+      type: 'line'
+    },
+    style: {
+      fg: 'black',
+      bg: 'none',
+    }
+  });
+
+
   // Append our box to the screen.
   screen.append(activityBox);
   screen.append(bugBox);
+  screen.append(logBox);
 
   // Quit on Escape, q, or Control-C.
   screen.key(['escape', 'q', 'C-c'], function(ch, key) {
@@ -137,6 +157,10 @@ function formatForBugBox(trackedBug, attachmentData) {
 }
 
 function redrawEvents(inEvents) {
+  if (! activityBox) {
+    return;
+  }
+
   activityBox.setContent('{bold}Activity{/bold}!');
 
   var keys = Object.keys(inEvents);
@@ -153,6 +177,10 @@ function redrawEvents(inEvents) {
 }
 
 function redrawBugs(inBugs, allBugData, allAttachmentData) {
+  if (! bugBox) {
+    return;
+  }
+
   bugBox.setContent('{bold}' + Object.keys(inBugs).length + '/' + Object.keys(allBugData).length + '/' + Object.keys(allAttachmentData).length+ ' Bugs{/bold}!');
 
   var keys = Object.keys(inBugs);
@@ -168,9 +196,15 @@ function redrawBugs(inBugs, allBugData, allAttachmentData) {
   screen.render();
 }
 
+function logString(aString) {
+  logBox.insertBottom(aString);
+  screen.render();
+}
+
 module.exports.redrawEvents = redrawEvents;
 module.exports.redrawBugs = redrawBugs;
 module.exports.formatForEventBox = formatForEventBox;
 module.exports.formatForBugBox = formatForBugBox;
 module.exports.initializeBlessedDashboard = initializeBlessedDashboard;
+module.exports.logString = logString;
 
