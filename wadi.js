@@ -9,7 +9,7 @@ var dashboard = require('./dashboard.js');
 var allEvents = {};
 var allBugSummaries = {};
 var allBugData = {};
-var allAttachments = {};
+var allAttachmentData = {};
 
 var github = new GitHub({
     // required 
@@ -42,20 +42,23 @@ function addBugsTrackedBy(inBugID) {
 
       // and for each tracked bug ID, go find info for that bug
 
-      // request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "/attachment", function(error, response, body) {
-      //   try {
-      //     var parsedResult = JSON.parse(body);  
-      //     if (parsedResult.bugs[depends_on_list[bugIndex]]) {
-      //       var attachmentContent = parsedResult.bugs[depends_on_list[bugIndex]];
-      //       allAttachments[depends_on_list[bugIndex]] = attachmentContent;
-      //       // console.log(bugID, attachmentContent);
-      //       allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, attachmentContent);
-      //       dashboard.redrawBugs(allBugSummaries, allBugData);
-      //     }      
-      //   }
-      //   catch (e) {
-      //   }
-      // });
+      var attachmentURL = "http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "/attachment";
+      request(attachmentURL, function(error, response, body) {
+        try {
+          if (error) {
+            throw new Error(error); 
+          }
+          var parsedResult = JSON.parse(body);
+          var attachmentBugList = Object.keys(parsedResult.bugs);
+
+          if (attachmentBugList.length > 0) {
+            allAttachmentData[attachmentBugList[0]] = parsedResult;
+          }      
+        }
+        catch (e) {
+          // console.log(e);
+        }
+      });
 
       request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "?include_fields=id,status,summary,assigned_to", function(error, response, body) {
         try {
@@ -69,7 +72,7 @@ function addBugsTrackedBy(inBugID) {
               // do nothing
             } else {
               allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug);
-              dashboard.redrawBugs(allBugSummaries, allBugData);
+              dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
             }
           } else {
             // missing buglist!
@@ -78,10 +81,10 @@ function addBugsTrackedBy(inBugID) {
         }
         catch (e) {
           allBugSummaries['' + bugID] = bugID + ' error ' + e;   
-          dashboard.redrawBugs(allBugSummaries, allBugData);
+          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
         }
       });
-    }
+    } /* for */
   });
 }
 
