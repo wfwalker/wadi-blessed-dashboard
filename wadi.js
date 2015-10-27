@@ -5,6 +5,7 @@ var request = require('request');
 var GitHub = require("github");
 var util = require('util');
 var dashboard = require('./dashboard.js');
+var globalTimeout = 90000;
 
 var allEvents = {};
 var allBugSummaries = {};
@@ -18,7 +19,7 @@ var github = new GitHub({
     debug: false,
     protocol: "https",
     host: "api.github.com",
-    timeout: 30000
+    timeout: globalTimeout
   });
 
 github.authenticate({
@@ -33,7 +34,7 @@ github.authenticate({
 
 function addAttachmentInfo(inBugID) {
   var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment";
-  request({ uri: attachmentURL, timeout: 30000 }, function(error, response, body) {
+  request({ uri: attachmentURL, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
@@ -72,7 +73,7 @@ function addAttachmentInfo(inBugID) {
 
 function addBugDetails(inBugID) {
   var bugDataURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,status,summary,assigned_to";
-  request({ uri: bugDataURL, timeout: 30000 }, function(error, response, body) {
+  request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
@@ -100,7 +101,8 @@ function addBugDetails(inBugID) {
 }
 
 function addBugsTrackedBy(inBugID) {
-  request("https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
+  var trackerURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on";
+  request({ uri: trackerURL, timeout: globalTimeout }, function(error, response, body) {
     if (error) {
       throw new Error(error); 
     }
