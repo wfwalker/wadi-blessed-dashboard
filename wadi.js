@@ -32,7 +32,7 @@ github.authenticate({
 // TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
 function addAttachmentInfo(inBugID) {
-  var attachmentURL = "http://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment";
+  var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment";
   request({ uri: attachmentURL, timeout: 30000 }, function(error, response, body) {
     try {
       if (error) {
@@ -45,7 +45,7 @@ function addAttachmentInfo(inBugID) {
         var tmpBugID = attachmentBugList[0];
         if (parsedResult.bugs[tmpBugID].length > 0) {
           allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
-          allBugSummaries[tmpBugID] = dashboard.formatForBugBox(trackedBug, parsedResult.bugs[tmpBugID]);
+          allBugSummaries[tmpBugID] = dashboard.formatForBugBox(allBugData[tmpBugID], parsedResult.bugs[tmpBugID]);
           dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
           dashboard.logString(tmpBugID, parsedResult.bugs[tmpBugID]);
         }
@@ -58,7 +58,7 @@ function addAttachmentInfo(inBugID) {
 }
 
 function addBugDetails(inBugID) {
-  var bugDataURL = "http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,status,summary,assigned_to";
+  var bugDataURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,status,summary,assigned_to";
   request({ uri: bugDataURL, timeout: 30000 }, function(error, response, body) {
     try {
       if (error) {
@@ -71,16 +71,12 @@ function addBugDetails(inBugID) {
         var trackedBug = parsedResult.bugs[0];
         allBugData['' + trackedBug.id] = trackedBug;
 
-        if (trackedBug.status == 'RESOLVED' || trackedBug.status == 'VERIFIED') {
-          // do nothing
-        } else {
-          allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, allAttachmentData[trackedBug.id]);
-          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
-        }
+        allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, allAttachmentData[trackedBug.id]);
+        dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
       } else {
         // missing buglist!
-        allBugSummaries['' + bugID] = bugID + ' missing bug info';   
-        dashboard.logString(bugId + ' missing bug info');
+        allBugSummaries['' + inBugID] = inBugID + ' missing bug info';   
+        dashboard.logString(inBugID + ' missing bug info');
       }
     }
     catch (e) {
@@ -91,7 +87,7 @@ function addBugDetails(inBugID) {
 }
 
 function addBugsTrackedBy(inBugID) {
-  request("http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
+  request("https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
     if (error) {
       throw new Error(error); 
     }
