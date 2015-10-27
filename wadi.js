@@ -31,6 +31,32 @@ github.authenticate({
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
 // TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
+function addAttachmentInfo(inBugID) {
+  var attachmentURL = "http://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment";
+  request({ uri: attachmentURL, timeout: 30000 }, function(error, response, body) {
+    try {
+      if (error) {
+        throw new Error(error); 
+      }
+      var parsedResult = JSON.parse(body);
+      var attachmentBugList = Object.keys(parsedResult.bugs);
+
+      if (attachmentBugList.length > 0) {
+        var tmpBugID = attachmentBugList[0];
+        if (parsedResult.bugs[tmpBugID].length > 0) {
+          allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
+          allBugSummaries[tmpBugID] = dashboard.formatForBugBox(trackedBug, parsedResult.bugs[tmpBugID]);
+          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+        }
+      }      
+    }
+    catch (e) {
+      // allBugSummaries['' + Date.now()] = 'error ' + e;   
+      // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+    }
+  });
+}
+
 function addBugsTrackedBy(inBugID) {
   request("http://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on", function(error, response, body) {
     if (error) {
@@ -45,29 +71,7 @@ function addBugsTrackedBy(inBugID) {
 
       // and for each tracked bug ID, go find info for that bug
 
-      var attachmentURL = "http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "/attachment";
-      request({ uri: attachmentURL, timeout: 30000 }, function(error, response, body) {
-        try {
-          if (error) {
-            throw new Error(error); 
-          }
-          var parsedResult = JSON.parse(body);
-          var attachmentBugList = Object.keys(parsedResult.bugs);
-
-          if (attachmentBugList.length > 0) {
-            var tmpBugID = attachmentBugList[0];
-            if (parsedResult.bugs[tmpBugID].length > 0) {
-              allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
-              allBugSummaries[tmpBugID] = dashboard.formatForBugBox(trackedBug, parsedResult.bugs[tmpBugID]);
-              dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
-            }
-          }      
-        }
-        catch (e) {
-          // allBugSummaries['' + Date.now()] = 'error ' + e;   
-          // dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
-        }
-      });
+      addAttachmentInfo(bugID);
 
       var bugDataURL = "http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "?include_fields=id,status,summary,assigned_to";
       request({ uri: bugDataURL, timeout: 30000 }, function(error, response, body) {
