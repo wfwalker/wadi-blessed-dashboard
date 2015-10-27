@@ -146,8 +146,8 @@ function redrawEvents(inEvents) {
   screen.render();
 }
 
-function redrawBugs(inBugs) {
-  bugBox.setContent('{bold}Bugs{/bold}!');
+function redrawBugs(inBugs, allBugData) {
+  bugBox.setContent('{bold}' + Object.keys(inBugs).length + '/' + Object.keys(allBugData).length + ' Bugs{/bold}!');
 
   var keys = Object.keys(inBugs);
 

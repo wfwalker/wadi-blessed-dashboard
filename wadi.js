@@ -8,6 +8,7 @@ var dashboard = require('./dashboard.js');
 
 var allEvents = {};
 var allBugSummaries = {};
+var allBugData = {};
 var allAttachments = {};
 
 var github = new GitHub({
@@ -49,7 +50,7 @@ function addBugsTrackedBy(inBugID) {
       //       allAttachments[depends_on_list[bugIndex]] = attachmentContent;
       //       // console.log(bugID, attachmentContent);
       //       allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, attachmentContent);
-      //       dashboard.redrawBugs(allBugSummaries);            
+      //       dashboard.redrawBugs(allBugSummaries, allBugData);
       //     }      
       //   }
       //   catch (e) {
@@ -62,12 +63,13 @@ function addBugsTrackedBy(inBugID) {
 
           if (parsedResult.bugs) {
             var trackedBug = parsedResult.bugs[0];
+            allBugData['' + trackedBug.id] = trackedBug;
 
             if (trackedBug.status == 'RESOLVED' || trackedBug.status == 'VERIFIED') {
               // do nothing
             } else {
               allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug);
-              dashboard.redrawBugs(allBugSummaries);
+              dashboard.redrawBugs(allBugSummaries, allBugData);
             }
           } else {
             // missing buglist!
@@ -76,7 +78,7 @@ function addBugsTrackedBy(inBugID) {
         }
         catch (e) {
           allBugSummaries['' + bugID] = bugID + ' error ' + e;   
-          dashboard.redrawBugs(allBugSummaries);
+          dashboard.redrawBugs(allBugSummaries, allBugData);
         }
       });
     }
