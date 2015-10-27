@@ -8,14 +8,7 @@ var dashboard = require('./dashboard.js');
 
 var allEvents = {};
 var allBugs = {};
-
-// add lpad to string
-String.prototype.lpad = function(padString, length) {
-  var str = this;
-  while (str.length < length)
-    str = padString + str;
-  return str;
-}
+var allAttachments = {};
 
 var github = new GitHub({
     // required 
@@ -48,6 +41,21 @@ function addBugsTrackedBy(inBugID) {
 
       // and for each tracked bug ID, go find info for that bug
 
+      // request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "/attachment", function(error, response, body) {
+      //   try {
+      //     var parsedResult = JSON.parse(body);  
+      //     if (parsedResult.bugs[depends_on_list[bugIndex]]) {
+      //       var attachmentContent = parsedResult.bugs[depends_on_list[bugIndex]];
+      //       allAttachments[depends_on_list[bugIndex]] = attachmentContent;
+      //       // console.log(bugID, attachmentContent);
+      //       allBugs['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, attachmentContent);
+      //       dashboard.redrawBugs(allBugs);            
+      //     }      
+      //   }
+      //   catch (e) {
+      //   }
+      // });
+
       request("http://bugzilla.mozilla.org/rest/bug/" + depends_on_list[bugIndex] + "?include_fields=id,status,summary,assigned_to", function(error, response, body) {
         try {
           var parsedResult = JSON.parse(body);
@@ -61,6 +69,9 @@ function addBugsTrackedBy(inBugID) {
               allBugs['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug);
               dashboard.redrawBugs(allBugs);
             }
+          } else {
+            // missing buglist!
+            allBugs['' + bugID] = bugID + ' missing bug info';   
           }
         }
         catch (e) {
