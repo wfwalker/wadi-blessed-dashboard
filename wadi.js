@@ -59,8 +59,16 @@ function addAttachmentInfo(inBugID) {
 
         // ... if that first bug has a non-zero list of attachments 
         if (parsedResult.bugs[tmpBugID].length > 0) {
+          var myAttachments = parsedResult.bugs[tmpBugID];
+
           // store them in the global dictionary
-          allAttachmentData['' + tmpBugID] = parsedResult.bugs[tmpBugID];
+          allAttachmentData['' + tmpBugID] = myAttachments;
+
+          var myPatches = myAttachments.filter(function (a) { return a.is_patch; });
+
+          if (myPatches.length > 0) {
+            dashboard.logString(tmpBugID + ' PATCHES');
+          }
 
           // if we already have the bug details, go redo the summary
           if (allBugData['' + tmpBugID]) {

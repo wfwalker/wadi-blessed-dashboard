@@ -68,6 +68,8 @@ function initializeBlessedDashboard() {
     height: '50%',
     content: '{bold}Log{/bold}!',
     tags: true,
+    scrollable: true,
+    alwaysScroll: true,
     border: {
       type: 'line'
     },
@@ -197,6 +199,7 @@ function redrawBugs(inBugs, allBugData, allAttachmentData) {
 
 function logString(aString) {
   logBox.insertBottom(aString);
+  logBox.setScrollPerc(100);
   screen.render();
 }
 
