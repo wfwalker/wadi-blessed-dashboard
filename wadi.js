@@ -221,7 +221,3 @@ addEventsFromRepo('serviceworker-cookbook');
 
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
-
-dashboard.logString('one ' + process.env.SEKRIT);
-dashboard.logString('two ' + process.env.BSEKRIT);
-
