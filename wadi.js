@@ -33,15 +33,23 @@ github.authenticate({
 // TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
 function addAttachmentInfo(inBugID) {
-  var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment";
+  var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment?api_key=" + process.env.BSEKRIT;
   request({ uri: attachmentURL, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
       }
+      if (response.statusCode != 200) {
+        throw new Error('bad response ' + response.statusCode);
+      }
 
       // try to parse the response and find the list of bugs
       var parsedResult = JSON.parse(body);
+
+      if (parsedResult.error) {
+        throw new Error(parsedResult.message);
+      }
+
       var attachmentBugList = Object.keys(parsedResult.bugs);
 
       // if this attachments info includes a non-empty list of bugs ...
@@ -52,16 +60,13 @@ function addAttachmentInfo(inBugID) {
         // ... if that first bug has a non-zero list of attachments 
         if (parsedResult.bugs[tmpBugID].length > 0) {
           // store them in the global dictionary
-          allAttachmentData[tmpBugID] = parsedResult.bugs[tmpBugID];
+          allAttachmentData['' + tmpBugID] = parsedResult.bugs[tmpBugID];
 
           // if we already have the bug details, go redo the summary
-          if (allBugData[tmpBugID]) {
-            allBugSummaries[tmpBugID] = dashboard.formatForBugBox(allBugData[tmpBugID], parsedResult.bugs[tmpBugID]);
+          if (allBugData['' + tmpBugID]) {
+            allBugSummaries['' + tmpBugID] = dashboard.formatForBugBox(allBugData['' + tmpBugID], parsedResult.bugs['' + tmpBugID]);
             dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);            
           }
-
-          // log about it
-          dashboard.logString(tmpBugID, parsedResult.bugs[tmpBugID]);
         }
       }      
     }
@@ -71,8 +76,13 @@ function addAttachmentInfo(inBugID) {
   });
 }
 
-function addBugDetails(inBugID) {
-  var bugDataURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,status,summary,assigned_to";
+function addPublicBugDetails(inBugIDList) {
+  var idList = inBugIDList.join(',');
+  var bugDataURL = "https://bugzilla.mozilla.org/rest/bug?bug_id=" + idList + "&bug_id_type=anyexact&f1=bug_group&o1=isempty&api_key=" + process.env.BSEKRIT;
+
+  // TODO: filter the depends_on_list like this:
+  // https://bugzilla.mozilla.org/rest/bug?bug_id=1186856,1188822,1189659,1200677,1201498,120166,1173240&bug_id_type=anyexact&f1=bug_group&o1=isempty      
+
   request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
@@ -81,35 +91,83 @@ function addBugDetails(inBugID) {
 
       var parsedResult = JSON.parse(body);
 
-      if (parsedResult.bugs) {
-        var trackedBug = parsedResult.bugs[0];
-        allBugData['' + trackedBug.id] = trackedBug;
+      if (parsedResult.error) {
+        throw new Error(parsedResult.message);
+      }
 
-        allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, allAttachmentData[trackedBug.id]);
-        dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+      if (response.statusCode != 200) {
+        throw new Error('bad response ' + response.statusCode);
+      }
+
+      addBugDetails(parsedResult.bugs.map(function (a) { return a.id }));
+    }
+    catch (e) {
+      dashboard.logString('multibug details error: ' + e);
+    }
+  });
+}
+
+function addBugDetails(inBugIDList) {
+  var idList = inBugIDList.map(function(a) { return 'ids=' + a; }).join('&');
+  var bugDataURL = "https://bugzilla.mozilla.org/rest/bug/?f1=bug_group&o1=isempty&include_fields=id,status,summary,assigned_to&" + idList + '&api_key=' + process.env.BSEKRIT;
+
+  request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
+    try {
+      if (error) {
+        throw new Error(error); 
+      }
+
+      var parsedResult = JSON.parse(body);
+
+      if (parsedResult.error) {
+        throw new Error(parsedResult.message);
+      }
+
+      if (response.statusCode != 200) {
+        throw new Error('bad response ' + response.statusCode);
+      }
+
+      if (parsedResult.bugs) {
+        dashboard.logString('multibug details ' + inBugIDList.length + ' ' + parsedResult.bugs.length);
+
+        for(var index = 0; index < parsedResult.bugs.length; index++) {
+          var trackedBug = parsedResult.bugs[index];
+
+          allBugData['' + trackedBug.id] = trackedBug;
+          allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, allAttachmentData['' + trackedBug.id]);
+          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+        }
       } else {
-        // missing buglist!
-        allBugSummaries['' + inBugID] = inBugID + ' missing bug info';   
-        dashboard.logString(inBugID + ' missing bug info');
+        dashboard.logString('multibug missing bug info ' + response.statusCode);
       }
     }
     catch (e) {
-      allBugSummaries['' + inBugID] = inBugID + ' details error: ' + e;   
-      dashboard.logString(inBugID + ' details error: ' + e);
+      dashboard.logString('multibug details error: ' + e);
     }
   });
 }
 
 function addBugsTrackedBy(inBugID) {
-  var trackerURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?include_fields=id,depends_on";
+  var trackerURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?f1=bug_group&o1=isempty&include_fields=id,depends_on&api_key=" + process.env.BSEKRIT;
   request({ uri: trackerURL, timeout: globalTimeout }, function(error, response, body) {
     if (error) {
       throw new Error(error); 
     }
+    if (response.statusCode != 200) {
+      throw new Error('bad response ' + response.statusCode);
+    }
 
     try {
       var tracker = JSON.parse(body);
+
+      if (tracker.error) {
+        throw new Error(tracker.message);
+      }
+
       var depends_on_list = tracker.bugs[0].depends_on;
+
+      // add details for a whole list of bugs
+      addPublicBugDetails(tracker.bugs[0].depends_on);
 
       // loop through the list of tracked bug ID's
       for (var bugIndex in depends_on_list) {
@@ -117,7 +175,6 @@ function addBugsTrackedBy(inBugID) {
 
         // and for each tracked bug ID, go find info for that bug
         addAttachmentInfo(bugID);
-        addBugDetails(bugID);
       }      
     }
     catch (e) {
@@ -150,8 +207,6 @@ function addEventsFromRepo(inRepoName) {
 
 dashboard.initializeBlessedDashboard();
 
-dashboard.logString('starting');
-
 addEventsFromRepo('oghliner');
 addEventsFromRepo('platatus');
 addEventsFromRepo('serviceworker-cookbook');
@@ -159,5 +214,6 @@ addEventsFromRepo('serviceworker-cookbook');
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
 
-dashboard.logString('done starting');
+dashboard.logString('one ' + process.env.SEKRIT);
+dashboard.logString('two ' + process.env.BSEKRIT);
 
