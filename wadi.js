@@ -7,10 +7,17 @@ var util = require('util');
 var dashboard = require('./dashboard.js');
 var globalTimeout = 90000;
 
+var gBugInfo = {};
+
 var allEvents = {};
-var allBugSummaries = {};
-var allBugData = {};
-var allAttachmentData = {};
+
+function getBugInfo(inBugID) {
+  if (! gBugInfo['' + inBugID]) {
+    gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null };
+  }
+
+  return gBugInfo['' + inBugID];
+}
 
 var github = new GitHub({
     // required 
@@ -62,7 +69,7 @@ function addAttachmentInfo(inBugID) {
           var myAttachments = parsedResult.bugs[tmpBugID];
 
           // store them in the global dictionary
-          allAttachmentData['' + tmpBugID] = myAttachments;
+          getBugInfo(tmpBugID).attachments = myAttachments;
 
           var myPatches = myAttachments.filter(function (a) { return a.is_patch; });
 
@@ -71,9 +78,9 @@ function addAttachmentInfo(inBugID) {
           }
 
           // if we already have the bug details, go redo the summary
-          if (allBugData['' + tmpBugID]) {
-            allBugSummaries['' + tmpBugID] = dashboard.formatForBugBox(allBugData['' + tmpBugID], parsedResult.bugs['' + tmpBugID]);
-            dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);            
+          if (getBugInfo(tmpBugID).data) {
+            getBugInfo(tmpBugID).summary = dashboard.formatForBugBox(getBugInfo(tmpBugID));
+            dashboard.redrawBugs(gBugInfo);
           }
         }
       }      
@@ -141,9 +148,9 @@ function addBugDetails(inBugIDList) {
         for(var index = 0; index < parsedResult.bugs.length; index++) {
           var trackedBug = parsedResult.bugs[index];
 
-          allBugData['' + trackedBug.id] = trackedBug;
-          allBugSummaries['' + trackedBug.id] = dashboard.formatForBugBox(trackedBug, allAttachmentData['' + trackedBug.id]);
-          dashboard.redrawBugs(allBugSummaries, allBugData, allAttachmentData);
+          getBugInfo(trackedBug.id).data = trackedBug;
+          getBugInfo(trackedBug.id).summary = dashboard.formatForBugBox(getBugInfo(trackedBug.id));
+          dashboard.redrawBugs(gBugInfo);
         }
       } else {
         dashboard.logString('multibug missing bug info ' + response.statusCode);

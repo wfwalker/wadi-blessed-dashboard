@@ -137,23 +137,23 @@ function formatForEventBox(inRepoName, anActivity) {
   return formattedString;  
 }
 
-function formatForBugBox(trackedBug, attachmentData) {
+function formatForBugBox(inBugInfo) {
   var assignee = 'nobody';
   var attachmentString = '';
 
-  if (trackedBug.assigned_to != 'nobody@mozilla.org') {
-    assignee = trackedBug.assigned_to;
+  if (inBugInfo.data.assigned_to != 'nobody@mozilla.org') {
+    assignee = inBugInfo.data.assigned_to;
   }
 
-  if (attachmentData) {
+  if (inBugInfo.attachments) {
     attachmentString = 'MOO';
   }
 
   return util.format("%s %s %s %s",
-    (''+trackedBug.id).lpad(' ', 7),
+    (''+inBugInfo.data.id).lpad(' ', 7),
     assignee.substring(0, 15).lpad(' ', 17),
-    trackedBug.status.lpad(' ', 10),
-    attachmentString + ' ' + trackedBug.summary.substring(0,50)
+    inBugInfo.data.status.lpad(' ', 10),
+    attachmentString + ' ' + inBugInfo.data.summary.substring(0,50)
   );
 }
 
@@ -177,21 +177,23 @@ function redrawEvents(inEvents) {
   screen.render();
 }
 
-function redrawBugs(inBugs, allBugData, allAttachmentData) {
+function redrawBugs(inBugInfo) {
   if (! bugBox) {
     return;
   }
 
-  bugBox.setContent('{bold}' + Object.keys(inBugs).length + '/' + Object.keys(allBugData).length + '/' + Object.keys(allAttachmentData).length+ ' Bugs{/bold}!');
+  bugBox.setContent('{bold}' + Object.keys(inBugInfo).length + ' Bugs{/bold}!');
 
-  var keys = Object.keys(inBugs);
+  var keys = Object.keys(inBugInfo);
 
   keys.sort();
   keys.reverse();
 
   for (var index = 0; index <  keys.length; index++) {
     var aKey = keys[index];
-    bugBox.insertBottom(inBugs[aKey]);
+    if (inBugInfo[aKey].summary) {
+      bugBox.insertBottom(inBugInfo[aKey].summary);
+    }
   }
 
   screen.render();
