@@ -96,24 +96,24 @@ function initializeBlessedDashboard() {
 function formatForEventBox(inRepoName, anActivity) {
   var activityDescription = anActivity.type;
   var activityActor = '';
-  var formattingString = "%s %s %s %s";
+  var formattingString = ["%s", "%s", "%s", "%s"];
 
   if (anActivity.actor) {
     activityActor = anActivity.actor.login;
   }
 
   if (anActivity.type == 'IssueCommentEvent') {
-    formattingString = "{cyan-fg}%s %s %s %s{/}";
+    formattingString[3] = "{cyan-fg}%s {/}";
     activityDescription = '"' + anActivity.payload.comment.body + '"';
   } else if (anActivity.type == 'IssuesEvent') {
     activityDescription = 'Issue ' + anActivity.payload.issue.body;
   } else if (anActivity.type == 'PullRequestEvent') {
     activityDescription = 'PR ' + anActivity.payload.pull_request.title;
-    formattingString = "{bold}%s %s %s %s{/}";
+    formattingString[3] = "{bold}%s{/}";
   } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
     activityDescription = 'Review ' + anActivity.payload.comment.body;
   } else if (anActivity.type == 'PushEvent') {
-    formattingString = "{blue-fg}%s %s %s %s{/}";
+    formattingString[3] = "{blue-fg}%s{/}";
     activityDescription = 'Push ' + anActivity.payload.commits[0].message;
   } else if (anActivity.type == 'CreateEvent') {
     activityDescription = 'Create ' + anActivity.payload.description;
@@ -121,9 +121,15 @@ function formatForEventBox(inRepoName, anActivity) {
     activityDescription = 'Watch ' + inRepoName;
   }
 
+  if (inRepoName == 'platatus') {
+    formattingString[0] = "{blue-fg}%s{/}"
+  } else if (inRepoName == 'oghliner') {
+    formattingString[0] = "{red-fg}%s{/}"
+  }
+
   if (anActivity.type) {
     var formattedString = util.format(
-      formattingString,
+      formattingString.join(' '),
       inRepoName.substring(0, 10).lpad(' ', 12),
       anActivity.created_at.substring(0,10),
       activityActor.substring(0, 10).lpad(' ', 12),
