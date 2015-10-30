@@ -145,15 +145,31 @@ function formatForBugBox(inBugInfo) {
     assignee = inBugInfo.data.assigned_to;
   }
 
-  if (inBugInfo.attachments) {
-    attachmentString = 'MOO';
+  if (inBugInfo.patches) {
+    attachmentString = inBugInfo.patches.map(function(p) {
+      if (p.is_obsolete) {
+        return 'o';
+      } else if (p.flags && p.flags[0]) {
+        return p.flags[0].status;
+      } else {
+        return 'u';
+      }
+    }).join(',');
   }
 
-  return util.format("%s %s %s %s",
+  var formatString = "%s %s {blue-fg}%s{/} %s";
+
+  if (inBugInfo.data.status == 'NEW') {
+    formatString = "%s %s {red-fg}%s{/} %s";
+  } else {
+    // moo
+  }
+
+  return util.format(formatString,
     (''+inBugInfo.data.id).lpad(' ', 7),
     assignee.substring(0, 15).lpad(' ', 17),
     inBugInfo.data.status.lpad(' ', 10),
-    attachmentString + ' ' + inBugInfo.data.summary.substring(0,50)
+    (attachmentString + inBugInfo.data.summary).substring(0,50)
   );
 }
 
