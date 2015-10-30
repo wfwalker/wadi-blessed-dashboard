@@ -177,20 +177,19 @@ function addBugsTrackedBy(inBugID) {
         throw new Error(tracker.message);
       }
 
-      var depends_on_list = tracker.bugs[0].depends_on;
+      var wanted_list = tracker.bugs[0].depends_on;
+      wanted_list.push(inBugID);
 
       // add details for a whole list of bugs
-      addPublicBugDetails(tracker.bugs[0].depends_on);
+      addPublicBugDetails(wanted_list);
 
       // loop through the list of tracked bug ID's
-      for (var bugIndex in depends_on_list) {
-        var bugID = depends_on_list[bugIndex];
+      for (var bugIndex in wanted_list) {
+        var bugID = wanted_list[bugIndex];
 
         // and for each tracked bug ID, go find info for that bug
         addAttachmentInfo(bugID);
       }
-
-      dashboard.logString('tracker ' + inBugID);
     }
     catch (e) {
       dashboard.logString('cannot parse tracker ' + e);
