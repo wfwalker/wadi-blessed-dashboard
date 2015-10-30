@@ -48,7 +48,7 @@ function initializeBlessedDashboard() {
     top: 0,
     left: '50%',
     width: '49%',
-    height: '49%',
+    height: '69%',
     content: '{bold}Bugs{/bold}!',
     tags: true,
     border: {
@@ -62,10 +62,10 @@ function initializeBlessedDashboard() {
 
   // Create a box for logging.
   logBox = blessed.box({
-    top: '50%',
+    top: '70%',
     left: '50%',
     width: '49%',
-    height: '50%',
+    height: '30%',
     content: '{bold}Log{/bold}!',
     tags: true,
     scrollable: true,

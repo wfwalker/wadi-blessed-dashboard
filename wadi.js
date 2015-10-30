@@ -19,7 +19,6 @@ function updateSummary(inBugID) {
   }
 }
 
-
 function getBugInfo(inBugID) {
   if (! gBugInfo['' + inBugID]) {
     gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null };
@@ -46,7 +45,6 @@ github.authenticate({
 // go find all the bugs we are tracking for WADI
 
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
-// TODO get attachments look for review status https://bugzilla.mozilla.org/rest/bug/707428/attachment
 
 function addAttachmentInfo(inBugID) {
   var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment?api_key=" + process.env.BSEKRIT;
@@ -98,9 +96,6 @@ function addAttachmentInfo(inBugID) {
 function addPublicBugDetails(inBugIDList) {
   var idList = inBugIDList.join(',');
   var bugDataURL = "https://bugzilla.mozilla.org/rest/bug?bug_id=" + idList + "&bug_id_type=anyexact&f1=bug_group&o1=isempty&api_key=" + process.env.BSEKRIT;
-
-  // TODO: filter the depends_on_list like this:
-  // https://bugzilla.mozilla.org/rest/bug?bug_id=1186856,1188822,1189659,1200677,1201498,120166,1173240&bug_id_type=anyexact&f1=bug_group&o1=isempty      
 
   request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
     try {
@@ -193,7 +188,9 @@ function addBugsTrackedBy(inBugID) {
 
         // and for each tracked bug ID, go find info for that bug
         addAttachmentInfo(bugID);
-      }      
+      }
+
+      dashboard.logString('tracker ' + inBugID);
     }
     catch (e) {
       dashboard.logString('cannot parse tracker ' + e);
@@ -231,3 +228,5 @@ addEventsFromRepo('serviceworker-cookbook');
 
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
+addBugsTrackedBy(1207262);
+addBugsTrackedBy(1003097);
