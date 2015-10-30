@@ -112,6 +112,8 @@ function formatForEventBox(inRepoName, anActivity) {
     formattingString[3] = "{bold}%s{/}";
   } else if (anActivity.type == 'PullRequestReviewCommentEvent') {
     activityDescription = 'Review ' + anActivity.payload.comment.body;
+  } else if (anActivity.type == 'GollumEvent') {
+    activityDescription = 'Wiki update';
   } else if (anActivity.type == 'PushEvent') {
     formattingString[3] = "{blue-fg}%s{/}";
     activityDescription = 'Push ' + anActivity.payload.commits[0].message;
@@ -128,6 +130,10 @@ function formatForEventBox(inRepoName, anActivity) {
   }
 
   if (anActivity.type) {
+    if (parseInt(anActivity.created_at.substring(9,10)) % 2) {
+      formattingString[1] = '{yellow-fg}%s{/}';
+    }
+
     var formattedString = util.format(
       formattingString.join(' '),
       inRepoName.substring(0, 10).lpad(' ', 12),
