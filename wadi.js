@@ -221,11 +221,17 @@ function addEventsFromRepo(inRepoName) {
 
 dashboard.initializeBlessedDashboard();
 
-addEventsFromRepo('oghliner');
-addEventsFromRepo('platatus');
-addEventsFromRepo('serviceworker-cookbook');
+function trackWADIRepositories() {
+  allEvents = {};
+  addEventsFromRepo('oghliner');
+  addEventsFromRepo('platatus');
+  addEventsFromRepo('serviceworker-cookbook');
+}
 
 addBugsTrackedBy(1201717);
 addBugsTrackedBy(1059784);
 addBugsTrackedBy(1207262);
 addBugsTrackedBy(1003097);
+
+trackWADIRepositories();
+setInterval(trackWADIRepositories, 60000);
