@@ -11,6 +11,11 @@ var gBugInfo = {};
 
 var allEvents = {};
 
+function updateSummary(inBugID) {
+  getBugInfo(inBugID).summary = dashboard.formatForBugBox(getBugInfo(inBugID));
+}
+
+
 function getBugInfo(inBugID) {
   if (! gBugInfo['' + inBugID]) {
     gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null };
@@ -79,7 +84,7 @@ function addAttachmentInfo(inBugID) {
 
           // if we already have the bug details, go redo the summary
           if (getBugInfo(tmpBugID).data) {
-            getBugInfo(tmpBugID).summary = dashboard.formatForBugBox(getBugInfo(tmpBugID));
+            updateSummary(tmpBugID);
             dashboard.redrawBugs(gBugInfo);
           }
         }
@@ -149,7 +154,7 @@ function addBugDetails(inBugIDList) {
           var trackedBug = parsedResult.bugs[index];
 
           getBugInfo(trackedBug.id).data = trackedBug;
-          getBugInfo(trackedBug.id).summary = dashboard.formatForBugBox(getBugInfo(trackedBug.id));
+          updateSummary(trackedBug.id);
           dashboard.redrawBugs(gBugInfo);
         }
       } else {
