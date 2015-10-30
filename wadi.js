@@ -12,7 +12,11 @@ var gBugInfo = {};
 var allEvents = {};
 
 function updateSummary(inBugID) {
-  getBugInfo(inBugID).summary = dashboard.formatForBugBox(getBugInfo(inBugID));
+  var tmpInfo = getBugInfo(inBugID);
+  if (tmpInfo.data && (tmpInfo.data.status != 'RESOLVED') && (tmpInfo.data.status != 'VERIFIED')) {
+    getBugInfo(inBugID).summary = dashboard.formatForBugBox(getBugInfo(inBugID));
+    dashboard.redrawBugs(gBugInfo);
+  }
 }
 
 
@@ -78,14 +82,9 @@ function addAttachmentInfo(inBugID) {
 
           var myPatches = myAttachments.filter(function (a) { return a.is_patch; });
 
-          if (myPatches.length > 0) {
-            dashboard.logString(tmpBugID + ' PATCHES');
-          }
-
           // if we already have the bug details, go redo the summary
           if (getBugInfo(tmpBugID).data) {
             updateSummary(tmpBugID);
-            dashboard.redrawBugs(gBugInfo);
           }
         }
       }      
@@ -155,7 +154,6 @@ function addBugDetails(inBugIDList) {
 
           getBugInfo(trackedBug.id).data = trackedBug;
           updateSummary(trackedBug.id);
-          dashboard.redrawBugs(gBugInfo);
         }
       } else {
         dashboard.logString('multibug missing bug info ' + response.statusCode);
