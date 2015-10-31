@@ -18,6 +18,14 @@ String.prototype.lpad = function(padString, length) {
   return str;
 }
 
+// add rpad to string
+String.prototype.rpad = function(padString, length) {
+  var str = this;
+  while (str.length < length)
+    str = str + padString;
+  return str;
+}
+
 function initializeBlessedDashboard() {
   // Create a screen object.
   screen = blessed.screen({
@@ -28,10 +36,10 @@ function initializeBlessedDashboard() {
 
   // Create a box for activities.
   activityBox = blessed.box({
-    top: 0,
+    top: '70%',
     left: 0,
-    width: '49%',
-    height: '99%',
+    width: '69%',
+    height: '30%',
     content: '{bold}Activity{/bold}!',
     tags: true,
     border: {
@@ -46,8 +54,8 @@ function initializeBlessedDashboard() {
   // Create a box for bugzilla bugs.
   bugBox = blessed.box({
     top: 0,
-    left: '50%',
-    width: '49%',
+    left: 0,
+    width: '99%',
     height: '69%',
     content: '{bold}Bugs{/bold}!',
     tags: true,
@@ -63,8 +71,8 @@ function initializeBlessedDashboard() {
   // Create a box for logging.
   logBox = blessed.box({
     top: '70%',
-    left: '50%',
-    width: '49%',
+    left: '70%',
+    width: '29%',
     height: '30%',
     content: '{bold}Log{/bold}!',
     tags: true,
@@ -138,7 +146,7 @@ function formatForEventBox(inRepoName, anActivity) {
       inRepoName.substring(0, 10).lpad(' ', 12),
       anActivity.created_at.substring(0,10),
       activityActor.substring(0, 10).lpad(' ', 12),
-      activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,50)
+      activityDescription.replace(/(\r\n|\n|\r)/gm," ").substring(0,90)
     );
 
   } else if (anActivity["x-ratelimit-limit"]) {
@@ -149,7 +157,7 @@ function formatForEventBox(inRepoName, anActivity) {
 }
 
 function formatForBugBox(inBugInfo) {
-  var assignee = 'nobody';
+  var assignee = '--';
   var attachmentString = '';
 
   if (inBugInfo.data.assigned_to != 'nobody@mozilla.org') {
@@ -168,19 +176,20 @@ function formatForBugBox(inBugInfo) {
     }).join(',');
   }
 
-  var formatString = "%s %s {blue-fg}%s{/} %s";
+  var formatString = "%s %s {blue-fg}%s{/} %s %s";
 
   if (inBugInfo.data.status == 'NEW') {
-    formatString = "%s %s {red-fg}%s{/} %s";
+    formatString = "%s %s {red-fg}%s{/} %s %s";
   } else {
     // moo
   }
 
   return util.format(formatString,
     (''+inBugInfo.data.id).lpad(' ', 7),
-    assignee.substring(0, 15).lpad(' ', 17),
+    assignee.substring(0, 15).rpad(' ', 17),
     inBugInfo.data.status.lpad(' ', 10),
-    (attachmentString + inBugInfo.data.summary).substring(0,50)
+    inBugInfo.data.summary.substring(0,90).rpad(' ', 91),
+    attachmentString.lpad(' ', 30)    
   );
 }
 
