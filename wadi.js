@@ -159,7 +159,18 @@ function addPublicBugDetails(inBugIDList) {
         throw new Error('bad response ' + response.statusCode);
       }
 
-      addBugDetails(parsedResult.bugs.map(function (a) { return a.id }));
+      var publicWantedList = parsedResult.bugs.map(function (a) { return a.id });
+
+      // loop through the list of tracked bug ID's
+      for (var bugIndex in publicWantedList) {
+        var bugID = publicWantedList[bugIndex];
+
+        // and for each tracked bug ID, go find info for that bug
+        addAttachmentInfo(bugID);
+        addHistoryInfo(bugID);
+      }      
+
+      addBugDetails(publicWantedList);
     }
     catch (e) {
       dashboard.logString('multibug details error: ' + e);
@@ -228,15 +239,6 @@ function addBugsTrackedBy(inBugID) {
 
       // add details for a whole list of bugs
       addPublicBugDetails(wanted_list);
-
-      // loop through the list of tracked bug ID's
-      for (var bugIndex in wanted_list) {
-        var bugID = wanted_list[bugIndex];
-
-        // and for each tracked bug ID, go find info for that bug
-        addAttachmentInfo(bugID);
-        addHistoryInfo(bugID);
-      }
     }
     catch (e) {
       dashboard.logString('cannot parse tracker ' + e);
