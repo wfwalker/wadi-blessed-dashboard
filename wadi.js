@@ -234,7 +234,7 @@ function addBugsTrackedBy(inBugID) {
         var bugID = wanted_list[bugIndex];
 
         // and for each tracked bug ID, go find info for that bug
-        // addAttachmentInfo(bugID);
+        addAttachmentInfo(bugID);
         addHistoryInfo(bugID);
       }
     }
