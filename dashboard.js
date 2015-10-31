@@ -79,7 +79,6 @@ function initializeBlessedDashboard() {
     }
   });
 
-
   // Append our box to the screen.
   screen.append(activityBox);
   screen.append(bugBox);

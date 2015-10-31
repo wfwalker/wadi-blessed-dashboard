@@ -21,7 +21,7 @@ function updateSummary(inBugID) {
 
 function getBugInfo(inBugID) {
   if (! gBugInfo['' + inBugID]) {
-    gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null };
+    gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null, history: null };
   }
 
   return gBugInfo['' + inBugID];
@@ -46,9 +46,55 @@ github.authenticate({
 
 // TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
 
+function addHistoryInfo(inBugID) {
+  var historyURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/history?api_key=" + process.env.BSEKRIT;
+  request({ uri: historyURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
+    try {
+      if (error) {
+        throw new Error(error); 
+      }
+      if (response.statusCode != 200) {
+        throw new Error('bad response ' + response.statusCode);
+      }
+
+      // try to parse the response and find the list of bugs
+      var parsedResult = JSON.parse(body);
+
+      if (parsedResult.error) {
+        throw new Error(parsedResult.message);
+      }
+
+      // if this attachments info includes a bug id...
+      if (parsedResult.bugs[0].id) {
+        // ... use it
+        var tmpBugID = parsedResult.bugs[0].id;
+
+
+        // ... if there's a history list 
+        if (parsedResult.bugs[0].history.length > 0) {
+          var myHistory = parsedResult.bugs[0].history;
+
+          dashboard.logString('history ' + tmpBugID + ' ' + parsedResult.bugs[0].history.length);
+
+          // store them in the global dictionary
+          getBugInfo(tmpBugID).history = myHistory;
+
+          // if we already have the bug details, go redo the summary
+          if (getBugInfo(tmpBugID).data) {
+            updateSummary(tmpBugID);
+          }
+        }
+      }      
+    }
+    catch (e) {
+      dashboard.logString(inBugID + ' history error: ' + e);
+    }
+  });
+}
+
 function addAttachmentInfo(inBugID) {
   var attachmentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/attachment?api_key=" + process.env.BSEKRIT;
-  request({ uri: attachmentURL, timeout: globalTimeout }, function(error, response, body) {
+  request({ uri: attachmentURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
@@ -97,7 +143,7 @@ function addPublicBugDetails(inBugIDList) {
   var idList = inBugIDList.join(',');
   var bugDataURL = "https://bugzilla.mozilla.org/rest/bug?bug_id=" + idList + "&bug_id_type=anyexact&f1=bug_group&o1=isempty&api_key=" + process.env.BSEKRIT;
 
-  request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
+  request({ uri: bugDataURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
@@ -125,7 +171,7 @@ function addBugDetails(inBugIDList) {
   var idList = inBugIDList.map(function(a) { return 'ids=' + a; }).join('&');
   var bugDataURL = "https://bugzilla.mozilla.org/rest/bug/?f1=bug_group&o1=isempty&include_fields=id,status,summary,assigned_to&" + idList + '&api_key=' + process.env.BSEKRIT;
 
-  request({ uri: bugDataURL, timeout: globalTimeout }, function(error, response, body) {
+  request({ uri: bugDataURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     try {
       if (error) {
         throw new Error(error); 
@@ -162,7 +208,7 @@ function addBugDetails(inBugIDList) {
 
 function addBugsTrackedBy(inBugID) {
   var trackerURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "?f1=bug_group&o1=isempty&include_fields=id,depends_on&api_key=" + process.env.BSEKRIT;
-  request({ uri: trackerURL, timeout: globalTimeout }, function(error, response, body) {
+  request({ uri: trackerURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     if (error) {
       throw new Error(error); 
     }
@@ -188,7 +234,8 @@ function addBugsTrackedBy(inBugID) {
         var bugID = wanted_list[bugIndex];
 
         // and for each tracked bug ID, go find info for that bug
-        addAttachmentInfo(bugID);
+        // addAttachmentInfo(bugID);
+        addHistoryInfo(bugID);
       }
     }
     catch (e) {
