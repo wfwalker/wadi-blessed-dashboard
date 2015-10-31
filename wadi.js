@@ -160,16 +160,6 @@ function addPublicBugDetails(inBugIDList) {
       }
 
       var publicWantedList = parsedResult.bugs.map(function (a) { return a.id });
-
-      // loop through the list of tracked bug ID's
-      for (var bugIndex in publicWantedList) {
-        var bugID = publicWantedList[bugIndex];
-
-        // and for each tracked bug ID, go find info for that bug
-        addAttachmentInfo(bugID);
-        addHistoryInfo(bugID);
-      }      
-
       addBugDetails(publicWantedList);
     }
     catch (e) {
@@ -203,6 +193,12 @@ function addBugDetails(inBugIDList) {
 
         for(var index = 0; index < parsedResult.bugs.length; index++) {
           var trackedBug = parsedResult.bugs[index];
+
+          // and for each unresolved bug ID, go find info for that bug
+          if (trackedBug.status != 'RESOLVED') {
+            addAttachmentInfo(trackedBug.id);
+            addHistoryInfo(trackedBug.id);
+          }
 
           getBugInfo(trackedBug.id).data = trackedBug;
           updateSummary(trackedBug.id);
