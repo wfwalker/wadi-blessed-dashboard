@@ -46,7 +46,7 @@ function initializeBlessedDashboard() {
       type: 'line'
     },
     style: {
-      fg: 'black',
+      fg: 'white',
       bg: 'none',
     }
   });
@@ -63,7 +63,7 @@ function initializeBlessedDashboard() {
       type: 'line'
     },
     style: {
-      fg: 'black',
+      fg: 'white',
       bg: 'none',
     }
   });
@@ -82,7 +82,7 @@ function initializeBlessedDashboard() {
       type: 'line'
     },
     style: {
-      fg: 'black',
+      fg: 'white',
       bg: 'none',
     }
   });

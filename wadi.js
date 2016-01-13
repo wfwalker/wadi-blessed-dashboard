@@ -1,6 +1,9 @@
 // Whole-script strict mode syntax
 "use strict";
 
+// SAMPLE USAGE
+// SEKRIT=xxx BSEKRIT=yyy node wadi.js
+
 var request = require('request');
 var GitHub = require("github");
 var util = require('util');
