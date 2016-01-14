@@ -254,7 +254,12 @@ function addEventsFromRepo(inUserName, inRepoName) {
 
       for (var activityIndex in activities) {
         var anActivity = activities[activityIndex];
-        allEvents[anActivity.created_at] = dashboard.formatForEventBox(inRepoName, anActivity);
+        try {
+          allEvents[anActivity.created_at] = dashboard.formatForEventBox(inRepoName, anActivity);
+        }
+        catch (e) {
+          allEvents[anActivity.created_at] = 'ERROR ' + e;
+        }
       }
       dashboard.redrawEvents(allEvents);
     }
