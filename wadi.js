@@ -245,8 +245,8 @@ function addBugsTrackedBy(inBugID) {
   });
 }
 
-function addEventsFromRepo(inRepoName) {
-  github.events.getFromRepo( { 'user': 'mozilla', 'repo': inRepoName, per_page: 100 }, function(err, activities) {
+function addEventsFromRepo(inUserName, inRepoName) {
+  github.events.getFromRepo( { 'user': inUserName, 'repo': inRepoName, per_page: 100 }, function(err, activities) {
     try {
       if (err) {
         throw new Error(err.message);
@@ -271,9 +271,13 @@ dashboard.initializeBlessedDashboard();
 
 function trackWADIRepositories() {
   allEvents = {};
-  addEventsFromRepo('oghliner');
-  addEventsFromRepo('platatus');
-  addEventsFromRepo('serviceworker-cookbook');
+  addEventsFromRepo('mozilla', 'oghliner');
+  addEventsFromRepo('mozilla', 'platatus');
+  addEventsFromRepo('mozilla', 'serviceworker-cookbook');
+  addEventsFromRepo('mozilla', 'progressive-apps-hq');
+  addEventsFromRepo('marco-c', 'wp-web-push');
+  addEventsFromRepo('marco-c', 'web-push');
+  addEventsFromRepo('marco-c', 'mercurius');
 }
 
 addBugsTrackedBy(1201717);

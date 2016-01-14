@@ -9,6 +9,7 @@ var util = require('util');
 var bugBox = null;
 var activityBox = null;
 var logBox = null;
+var gHeightDividerPercent = 50;
 
 // add lpad to string
 String.prototype.lpad = function(padString, length) {
@@ -36,10 +37,10 @@ function initializeBlessedDashboard() {
 
   // Create a box for activities.
   activityBox = blessed.box({
-    top: '70%',
+    top: gHeightDividerPercent + '%',
     left: 0,
-    width: '69%',
-    height: '30%',
+    width: '70%',
+    height: (100 - gHeightDividerPercent) + '%',
     content: '{bold}Activity{/bold}!',
     tags: true,
     border: {
@@ -55,8 +56,8 @@ function initializeBlessedDashboard() {
   bugBox = blessed.box({
     top: 0,
     left: 0,
-    width: '99%',
-    height: '69%',
+    width: '100%',
+    height: (gHeightDividerPercent) + '%',
     content: '{bold}Bugs{/bold}!',
     tags: true,
     border: {
@@ -70,10 +71,10 @@ function initializeBlessedDashboard() {
 
   // Create a box for logging.
   logBox = blessed.box({
-    top: '70%',
+    top: gHeightDividerPercent + '%',
     left: '70%',
-    width: '29%',
-    height: '30%',
+    width: '30%',
+    height: (100 - gHeightDividerPercent) + '%',
     content: '{bold}Log{/bold}!',
     tags: true,
     scrollable: true,
