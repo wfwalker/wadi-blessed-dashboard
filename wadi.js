@@ -310,4 +310,4 @@ npmDownloads('oghliner');
 getStargazers('mozilla', 'oghliner', 1);
 
 trackWADIRepositories();
-setInterval(trackWADIRepositories, 120000);
+setInterval(trackWADIRepositories, 300000);
