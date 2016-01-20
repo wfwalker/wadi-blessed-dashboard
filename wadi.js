@@ -291,4 +291,4 @@ addBugsTrackedBy(1207262);
 addBugsTrackedBy(1003097);
 
 trackWADIRepositories();
-setInterval(trackWADIRepositories, 60000);
+setInterval(trackWADIRepositories, 120000);
