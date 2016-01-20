@@ -250,12 +250,16 @@ function addBugsTrackedBy(inBugID) {
   });
 }
 
-// https://api.github.com/repos/mozilla/oghliner/stargazers
-function getStargazers(inUserName, inRepoName) {
-  github.repos.getStargazers( { 'user': inUserName, 'repo': inRepoName }, function(err, stargazers) {
-    dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazers.length + ' stargazers');
+function getStargazers(inUserName, inRepoName, inPageNum) {
+  github.repos.getStargazers( { user: inUserName, repo: inRepoName, page: inPageNum, per_page: 100 }, function(err, stargazers) {
+    if (stargazers.length < 100) {
+      var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
+      dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');
+    } else {
+      getStargazers(inUserName, inRepoName, inPageNum + 1);
+    }
   });
-}
+};
 
 function addEventsFromRepo(inUserName, inRepoName) {
   github.events.getFromRepo( { 'user': inUserName, 'repo': inRepoName, per_page: 100 }, function(err, activities) {
@@ -303,7 +307,7 @@ addBugsTrackedBy(1207262);
 addBugsTrackedBy(1003097);
 
 npmDownloads('oghliner');
-getStargazers('mozilla', 'oghliner');
+getStargazers('mozilla', 'oghliner', 1);
 
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 120000);
