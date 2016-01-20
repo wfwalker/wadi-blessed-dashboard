@@ -301,10 +301,12 @@ function trackWADIRepositories() {
   addEventsFromRepo('marco-c', 'mercurius');
 }
 
-addBugsTrackedBy(1201717);
-addBugsTrackedBy(1059784);
-addBugsTrackedBy(1207262);
-addBugsTrackedBy(1003097);
+addBugsTrackedBy(1201717); // web app developer initiative tracker
+addBugsTrackedBy(1059784); // Ship Service Workers on desktop on the release channel
+addBugsTrackedBy(1207262); // Ship Service Workers on Android on the release channel
+addBugsTrackedBy(1003097); // Worker debugging
+addBugsTrackedBy(1156054); // Implement Push API on Android
+addBugsTrackedBy(1201571); // Tracking bug for Push Notifications 
 
 npmDownloads('oghliner');
 getStargazers('mozilla', 'oghliner', 1);
