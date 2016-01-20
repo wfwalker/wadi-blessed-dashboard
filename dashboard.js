@@ -177,15 +177,16 @@ function formatForBugBox(inBugInfo) {
     }).join(',');
   }
 
-  var formatString = "%s %s {blue-fg}%s{/} %s %s";
+  var formatString = "%s %s %s {blue-fg}%s{/} %s %s";
 
   if (inBugInfo.data.status == 'NEW') {
-    formatString = "%s %s {red-fg}%s{/} %s %s";
+    formatString = "%s %s %s {red-fg}%s{/} %s %s";
   } else {
     // moo
   }
 
   return util.format(formatString,
+    inBugInfo.latest.substring(0,10).lpad(' ', 10),
     (''+inBugInfo.data.id).lpad(' ', 7),
     assignee.substring(0, 15).rpad(' ', 17),
     inBugInfo.data.status.lpad(' ', 10),
