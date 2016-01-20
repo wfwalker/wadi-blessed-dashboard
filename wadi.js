@@ -24,7 +24,7 @@ function updateSummary(inBugID) {
 
 function getBugInfo(inBugID) {
   if (! gBugInfo['' + inBugID]) {
-    gBugInfo['' + inBugID] = { summary: null, data: null, attachments: null, history: null };
+    gBugInfo['' + inBugID] = { latest: 'unknown', summary: null, data: null, attachments: null, history: null };
   }
 
   return gBugInfo['' + inBugID];
@@ -72,13 +72,22 @@ function addHistoryInfo(inBugID) {
         // ... use it
         var tmpBugID = parsedResult.bugs[0].id;
 
-
         // ... if there's a history list 
         if (parsedResult.bugs[0].history.length > 0) {
           var myHistory = parsedResult.bugs[0].history;
 
           // store them in the global dictionary
           getBugInfo(tmpBugID).history = myHistory;
+
+          var latest = myHistory.reduce(function (x, y, i) {
+            if (x.when > y.when) {
+              return x.when;
+            } else {
+              return y.when;
+            }
+          });
+
+          getBugInfo(tmpBugID).latest = latest;
 
           // if we already have the bug details, go redo the summary
           if (getBugInfo(tmpBugID).data) {
