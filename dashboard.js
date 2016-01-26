@@ -165,7 +165,7 @@ function formatForBugBox(inBugInfo) {
     assignee = inBugInfo.data.assigned_to;
   }
 
-  if (inBugInfo.patches) {
+  if (inBugInfo.patches && (inBugInfo.patches instanceof Array)) {
     attachmentString = inBugInfo.patches.map(function(p) {
       if (p.is_obsolete) {
         return 'o';
@@ -216,9 +216,6 @@ function redrawEvents(inEvents) {
 }
 
 function redrawBugs(inBugInfo) {
-  if (! bugBox) {
-    return;
-  }
 
   bugBox.setContent('{bold}' + Object.keys(inBugInfo).length + ' Bugs{/bold}!');
 

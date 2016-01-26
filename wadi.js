@@ -16,10 +16,11 @@ var allEvents = {};
 
 function updateSummary(inBugID) {
   var tmpInfo = getBugInfo(inBugID);
+
   if (tmpInfo.data && (tmpInfo.data.status != 'RESOLVED') && (tmpInfo.data.status != 'VERIFIED')) {
-    getBugInfo(inBugID).summary = dashboard.formatForBugBox(getBugInfo(inBugID));
+    getBugInfo(inBugID).summary = dashboard.formatForBugBox(tmpInfo);
     dashboard.redrawBugs(gBugInfo);
-  }
+  }    
 }
 
 function getBugInfo(inBugID) {
@@ -63,6 +64,10 @@ function addHistoryInfo(inBugID) {
       // try to parse the response and find the list of bugs
       var parsedResult = JSON.parse(body);
 
+      if (parsedResult == null) {
+        throw new Error('cannot parse body');
+      }
+
       if (parsedResult.error) {
         throw new Error(parsedResult.message);
       }
@@ -73,19 +78,23 @@ function addHistoryInfo(inBugID) {
         var tmpBugID = parsedResult.bugs[0].id;
 
         // ... if there's a history list 
-        if (parsedResult.bugs[0].history.length > 0) {
+        if (parsedResult.bugs[0].history && parsedResult.bugs[0].history.length > 0) {
           var myHistory = parsedResult.bugs[0].history;
 
           // store them in the global dictionary
           getBugInfo(tmpBugID).history = myHistory;
 
-          var latest = myHistory.reduce(function (x, y, i) {
-            if (x.when > y.when) {
-              return x.when;
-            } else {
-              return y.when;
-            }
-          });
+          var latest = myHistory[0].when;
+
+          if (myHistory.length > 1) {
+            latest = myHistory.reduce(function (x, y, i) {
+              if (x.when > y.when) {
+                return x.when;
+              } else {
+                return y.when;
+              }
+            });
+          }
 
           getBugInfo(tmpBugID).latest = latest;
 
@@ -93,6 +102,8 @@ function addHistoryInfo(inBugID) {
           if (getBugInfo(tmpBugID).data) {
             updateSummary(tmpBugID);
           }
+        } else {
+          dashboard.logString('no history or empty history');
         }
       }      
     }
@@ -306,6 +317,7 @@ function trackWADIRepositories() {
   addEventsFromRepo('mozilla', 'serviceworker-cookbook');
   addEventsFromRepo('mozilla', 'progressive-apps-hq');
   addEventsFromRepo('marco-c', 'wp-web-push');
+  addEventsFromRepo('darkwing', 'wp-sw-cache');
   addEventsFromRepo('marco-c', 'web-push');
   addEventsFromRepo('marco-c', 'mercurius');
 }
