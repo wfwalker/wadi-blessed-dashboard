@@ -331,6 +331,8 @@ addBugsTrackedBy(1201571); // Tracking bug for Push Notifications
 
 npmDownloads('oghliner');
 getStargazers('mozilla', 'oghliner', 1);
+getStargazers('mozilla', 'platatus', 1);
+getStargazers('mozilla', 'serviceworker-cookbook', 1);
 
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 300000);
