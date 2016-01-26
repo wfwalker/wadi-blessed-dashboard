@@ -217,8 +217,6 @@ function addBugDetails(inBugIDList) {
       }
 
       if (parsedResult.bugs) {
-        dashboard.logString('multibug details ' + inBugIDList.length + ' ' + parsedResult.bugs.length);
-
         for(var index = 0; index < parsedResult.bugs.length; index++) {
           var trackedBug = parsedResult.bugs[index];
 
