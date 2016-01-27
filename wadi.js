@@ -271,6 +271,10 @@ function addBugsTrackedBy(inBugID) {
 function getStargazers(inUserName, inRepoName, inPageNum) {
   github.repos.getStargazers({ user: inUserName, repo: inRepoName, page: inPageNum, per_page: 100 }, function(err, stargazers) {
     try {
+      if (err) {
+        throw new Error(err.message);
+      }
+
       if (stargazers.length < 100) {
         var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
         dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');

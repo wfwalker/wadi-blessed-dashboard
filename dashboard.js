@@ -30,7 +30,7 @@ String.prototype.rpad = function(padString, length) {
 function initializeBlessedDashboard() {
   // Create a screen object.
   screen = blessed.screen({
-    smartCSR: true
+    smartCSR: false,
   });
 
   screen.title = 'WADI activity';
