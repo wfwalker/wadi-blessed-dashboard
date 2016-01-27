@@ -284,8 +284,9 @@ function getStargazers(inUserName, inRepoName, inPageNum) {
       }
     }
     catch(e) {
-      dashboard.logString('cannot count stars ' + e);
+      dashboard.logString('retrying count stars ' + e);
       dashboard.logString(e.stack);
+      getStargazers(inUserName, inRepoName, inPageNum)
     }
   });
 };
