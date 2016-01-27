@@ -269,12 +269,18 @@ function addBugsTrackedBy(inBugID) {
 }
 
 function getStargazers(inUserName, inRepoName, inPageNum) {
-  github.repos.getStargazers( { user: inUserName, repo: inRepoName, page: inPageNum, per_page: 100 }, function(err, stargazers) {
-    if (stargazers.length < 100) {
-      var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
-      dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');
-    } else {
-      getStargazers(inUserName, inRepoName, inPageNum + 1);
+  github.repos.getStargazers({ user: inUserName, repo: inRepoName, page: inPageNum, per_page: 100 }, function(err, stargazers) {
+    try {
+      if (stargazers.length < 100) {
+        var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
+        dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');
+      } else {
+        getStargazers(inUserName, inRepoName, inPageNum + 1);
+      }
+    }
+    catch(e) {
+      dashboard.logString('cannot count stars ' + e);
+      dashboard.logString(e.stack);
     }
   });
 };
