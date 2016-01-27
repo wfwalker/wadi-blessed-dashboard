@@ -184,7 +184,8 @@ function addPublicBugDetails(inBugIDList) {
       addBugDetails(publicWantedList);
     }
     catch (e) {
-      dashboard.logString('multibug details error: ' + e);
+      dashboard.logString('retrying multibug details error: ' + e);
+      addPublicBugDetails(inBugIDList);
     }
   });
 }
