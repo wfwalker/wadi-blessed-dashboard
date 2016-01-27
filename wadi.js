@@ -285,7 +285,6 @@ function getStargazers(inUserName, inRepoName, inPageNum) {
     }
     catch(e) {
       dashboard.logString('retrying count stars ' + e);
-      dashboard.logString(e.stack);
       getStargazers(inUserName, inRepoName, inPageNum)
     }
   });
@@ -311,7 +310,6 @@ function addEventsFromRepo(inUserName, inRepoName) {
     }
     catch(e) {
       dashboard.logString('cannot parse events json ' + e);
-      dashboard.logString(e.stack);
     }
   });
 }
