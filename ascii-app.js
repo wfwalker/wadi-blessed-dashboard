@@ -6,6 +6,8 @@ var wadi = require('./wadi.js');
 
 dashboard.initializeBlessedDashboard();
 
+wadi.setDashboard(dashboard);
+
 function trackWADIRepositories() {
   allEvents = {};
   wadi.addEventsFromRepo('mozilla', 'oghliner');

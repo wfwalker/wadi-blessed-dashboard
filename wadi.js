@@ -7,12 +7,16 @@
 var request = require('request');
 var GitHub = require("github");
 var util = require('util');
-var dashboard = require('./dashboard.js');
+var dashboard = null;
 var globalTimeout = 90000;
 
 var gBugInfo = {};
 
 var allEvents = {};
+
+function setDashboard(inDashboard) {
+  dashboard = inDashboard;
+}
 
 function updateSummary(inBugID) {
   var tmpInfo = getBugInfo(inBugID);
@@ -314,6 +318,7 @@ function addEventsFromRepo(inUserName, inRepoName) {
   });
 }
 
+module.exports.setDashboard = setDashboard;
 module.exports.addEventsFromRepo = addEventsFromRepo;
 module.exports.addBugsTrackedBy = addBugsTrackedBy;
 module.exports.npmDownloads = npmDownloads;
