@@ -314,33 +314,7 @@ function addEventsFromRepo(inUserName, inRepoName) {
   });
 }
 
-// go find all the activity for wadi repo's
-
-dashboard.initializeBlessedDashboard();
-
-function trackWADIRepositories() {
-  allEvents = {};
-  addEventsFromRepo('mozilla', 'oghliner');
-  addEventsFromRepo('mozilla', 'platatus');
-  addEventsFromRepo('mozilla', 'serviceworker-cookbook');
-  addEventsFromRepo('mozilla', 'progressive-apps-hq');
-  addEventsFromRepo('marco-c', 'wp-web-push');
-  addEventsFromRepo('darkwing', 'wp-sw-cache');
-  addEventsFromRepo('marco-c', 'web-push');
-  addEventsFromRepo('marco-c', 'mercurius');
-}
-
-addBugsTrackedBy(1201717); // web app developer initiative tracker
-addBugsTrackedBy(1059784); // Ship Service Workers on desktop on the release channel
-addBugsTrackedBy(1207262); // Ship Service Workers on Android on the release channel
-addBugsTrackedBy(1003097); // Worker debugging
-addBugsTrackedBy(1156054); // Implement Push API on Android
-addBugsTrackedBy(1201571); // Tracking bug for Push Notifications 
-
-npmDownloads('oghliner');
-getStargazers('mozilla', 'oghliner', 1);
-getStargazers('mozilla', 'platatus', 1);
-getStargazers('mozilla', 'serviceworker-cookbook', 1);
-
-trackWADIRepositories();
-setInterval(trackWADIRepositories, 300000);
+module.exports.addEventsFromRepo = addEventsFromRepo;
+module.exports.addBugsTrackedBy = addBugsTrackedBy;
+module.exports.npmDownloads = npmDownloads;
+module.exports.getStargazers = getStargazers;
