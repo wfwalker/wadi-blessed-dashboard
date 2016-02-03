@@ -5,12 +5,15 @@
 	<tr>
 	    <td>{{this.created_at}}</td>
 
+	    <td>{{this.repo.name}}</td>
+
 	    <td>{{this.type}}</td>
 
 	    <td>
-	    {{#if this.payload.pull_request.title}}
 	    	{{this.payload.pull_request.title}}
-	    {{/if}}
+		    {{this.payload.comment.body}}
+		    {{this.payload.commits.0.message}}
+		    {{this.payload.description}}
 	    </td>
 
 	    <td>

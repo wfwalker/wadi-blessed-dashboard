@@ -8,7 +8,7 @@ function initialize() {
 }
 
 function formatForEventBox(inRepoName, anActivity) {
-  console.log('formatForEventBox');
+  console.log('formatForEventBox', anActivity);
   return anActivity;
 }
 
