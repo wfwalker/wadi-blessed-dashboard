@@ -1,6 +1,23 @@
-<h1>Example App: Events</h1>
 
-<table>
+<div class="ink-grid">
+  <div class="column-group">
+    <div class="all-50">
+
+<h1>WADI Activity: Events</h1>
+
+<table class='ink-table medium'>
+
+<thead>
+	<tr>
+		<th class="align-left">Date</th>
+		<th class="align-left">Repo</th>
+		<th class="align-left">Type</th>
+		<th class="align-left">Desc</th>
+		<th class="align-left">Who</th>
+	</tr>
+</thead>
+
+<tbody>
 {{#each events}}
 	<tr>
 	    <td>{{this.created_at}}</td>
@@ -27,4 +44,10 @@
 	    </td>   
     </tr>
 {{/each}}
+</tbody>	
 </table>
+
+</div>
+</div>
+</div>
+

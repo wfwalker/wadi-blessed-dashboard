@@ -8,12 +8,13 @@ function initialize() {
 }
 
 function formatForEventBox(inRepoName, anActivity) {
-  console.log('formatForEventBox', anActivity);
+  console.log('formatForEventBox');
   return anActivity;
 }
 
 function formatForBugBox(inBugInfo) {
-  console.log('formatForBugBox');
+  console.log('formatForBugBox', inBugInfo);
+  return inBugInfo;
 }
 
 function redrawEvents(inEvents) {

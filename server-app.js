@@ -44,7 +44,7 @@ server.get('/home', function (req, res) {
 });
 
 server.get('/bugs', function (req, res) {
-  res.render('bugs', wadi.getAllBugInfo());
+  res.render('bugs', {bugs: wadi.getAllBugInfo()});
 });
 
 server.get('/events', function (req, res) {

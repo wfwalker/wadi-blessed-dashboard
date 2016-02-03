@@ -1,1 +1,34 @@
-<h1>Example App: Bugs</h1>
+
+<div class="ink-grid">
+  <div class="column-group">
+    <div class="all-50">
+
+<h1>WADI Activity: Bugs</h1>
+
+<table class='ink-table medium'>
+
+<thead>
+	<tr>
+		<th class="align-left">ID</th>
+		<th class="align-left">Date</th>
+		<th class="align-left">Who</th>
+		<th class="align-left">Summary</th>
+	</tr>
+</thead>
+
+<tbody>
+{{#each bugs}}
+	<tr>
+	    <td>{{this.data.id}}</td>
+	    <td>{{this.latest}}</td>
+	    <td>{{this.data.assigned_to}}</td>
+	    <td>{{this.data.summary}}</td>
+    </tr>
+{{/each}}
+</tbody>	
+</table>
+
+</div>
+</div>
+</div>
+
