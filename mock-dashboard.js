@@ -9,6 +9,7 @@ function initialize() {
 
 function formatForEventBox(inRepoName, anActivity) {
   console.log('formatForEventBox');
+  return anActivity;
 }
 
 function formatForBugBox(inBugInfo) {

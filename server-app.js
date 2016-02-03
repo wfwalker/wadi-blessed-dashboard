@@ -35,8 +35,12 @@ setInterval(trackWADIRepositories, 300000);
 var express = require('express');
 var server = express();
 
-server.get('/', function (req, res) {
+server.get('/bugs', function (req, res) {
   res.send(JSON.stringify(wadi.getAllBugInfo()));
+});
+
+server.get('/events', function (req, res) {
+  res.send(JSON.stringify(wadi.getAllEvents()));
 });
 
 server.listen(3000, function () {
