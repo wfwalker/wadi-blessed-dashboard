@@ -10,7 +10,11 @@
 	    <td>{{this.type}}</td>
 
 	    <td>
+			{{#if this.payload.comment.html_url}}
+				<a href='{{this.payload.comment.html_url}}'>comment</a>
+			{{/if}}
 	    	{{this.payload.pull_request.title}}
+		    {{this.payload.issue.body}}
 		    {{this.payload.comment.body}}
 		    {{this.payload.commits.0.message}}
 		    {{this.payload.description}}
