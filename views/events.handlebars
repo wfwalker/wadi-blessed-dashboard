@@ -8,6 +8,12 @@
 	    <td>{{this.type}}</td>
 
 	    <td>
+	    {{#if this.payload.pull_request.title}}
+	    	{{this.payload.pull_request.title}}
+	    {{/if}}
+	    </td>
+
+	    <td>
 	    {{#if this.actor}}
 	    	<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
 	    {{/if}} 
