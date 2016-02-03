@@ -1,6 +1,8 @@
 var dashboard = require('./mock-dashboard.js');
 var wadi = require('./wadi.js');
 
+var express = require('express');
+var expressHandlebars  = require('express-handlebars');
 
 // go find all the activity for wadi repo's
 
@@ -32,15 +34,21 @@ wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1);
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 300000);
 
-var express = require('express');
 var server = express();
 
+server.engine('handlebars', expressHandlebars({defaultLayout: 'main'}));
+server.set('view engine', 'handlebars');
+ 
+server.get('/home', function (req, res) {
+    res.render('home');
+});
+
 server.get('/bugs', function (req, res) {
-  res.send(JSON.stringify(wadi.getAllBugInfo()));
+  res.render('bugs', wadi.getAllBugInfo());
 });
 
 server.get('/events', function (req, res) {
-  res.send(JSON.stringify(wadi.getAllEvents()));
+  res.render('events', {events: wadi.getAllEvents()});
 });
 
 server.listen(3000, function () {

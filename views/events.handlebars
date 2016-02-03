@@ -1,0 +1,17 @@
+<h1>Example App: Events</h1>
+
+<table>
+{{#each events}}
+	<tr>
+	    <td>{{this.created_at}}</td>
+
+	    <td>{{this.type}}</td>
+
+	    <td>
+	    {{#if this.actor}}
+	    	<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
+	    {{/if}} 
+	    </td>   
+    </tr>
+{{/each}}
+</table>

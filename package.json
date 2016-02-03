@@ -4,6 +4,7 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^2.4.1",
     "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
     "github": "^0.2.4",
     "request": "^2.65.0"
   }
