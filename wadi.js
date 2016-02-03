@@ -18,6 +18,14 @@ function setDashboard(inDashboard) {
   dashboard = inDashboard;
 }
 
+function getAllEvents() {
+  return allEvents;
+}
+
+function getAllBugInfo() {
+  return gBugInfo;
+}
+
 function updateSummary(inBugID) {
   var tmpInfo = getBugInfo(inBugID);
 
@@ -319,6 +327,9 @@ function addEventsFromRepo(inUserName, inRepoName) {
 }
 
 module.exports.setDashboard = setDashboard;
+module.exports.getAllEvents = getAllEvents;
+module.exports.getAllBugInfo = getAllBugInfo;
+
 module.exports.addEventsFromRepo = addEventsFromRepo;
 module.exports.addBugsTrackedBy = addBugsTrackedBy;
 module.exports.npmDownloads = npmDownloads;
