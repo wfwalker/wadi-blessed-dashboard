@@ -48,7 +48,15 @@ server.get('/bugs', function (req, res) {
 });
 
 server.get('/events', function (req, res) {
-  res.render('events', {events: wadi.getAllEvents()});
+  var events = wadi.getAllEvents();
+  var keys = Object.keys(wadi.getAllEvents());
+
+  keys.sort();
+  keys.reverse();
+
+  var sortedEvents = keys.map(function (k) { return events[k]; } );
+
+  res.render('events', {events: sortedEvents});
 });
 
 server.listen(3000, function () {

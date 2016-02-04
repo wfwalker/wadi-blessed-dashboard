@@ -8,21 +8,17 @@ function initialize() {
 }
 
 function formatForEventBox(inRepoName, anActivity) {
-  console.log('formatForEventBox');
   return anActivity;
 }
 
 function formatForBugBox(inBugInfo) {
-  console.log('formatForBugBox', inBugInfo);
   return inBugInfo;
 }
 
 function redrawEvents(inEvents) {
-  console.log('redrawEvents', inEvents.length);
 }
 
 function redrawBugs(inBugInfo) {
-  console.log('redrawBugs', Object.keys(inBugInfo).length);
 }
 
 function logString(aString) {
