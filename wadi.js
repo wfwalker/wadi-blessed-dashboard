@@ -202,10 +202,11 @@ function addPublicBugDetails(inBugIDList) {
   });
 }
 
-function npmDownloads(inPackageName) {
+function npmDownloads(inPackageName, inResults) {
   request({ uri: 'https://api.npmjs.org/downloads/point/last-month/' + inPackageName, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     var parsedResult = JSON.parse(body);
     dashboard.logString(inPackageName + ', ' + parsedResult.downloads + ' downloads last 30 days');
+    inResults.push(['npm downloads for ' + inPackageName, parsedResult.downloads]);
   });
 }
 
@@ -281,7 +282,7 @@ function addBugsTrackedBy(inBugID) {
   });
 }
 
-function getStargazers(inUserName, inRepoName, inPageNum) {
+function getStargazers(inUserName, inRepoName, inPageNum, inResults) {
   github.repos.getStargazers({ user: inUserName, repo: inRepoName, page: inPageNum, per_page: 100 }, function(err, stargazers) {
     try {
       if (err) {
@@ -291,13 +292,14 @@ function getStargazers(inUserName, inRepoName, inPageNum) {
       if (stargazers.length < 100) {
         var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
         dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');
+        inResults.push(['stargazers for ' + inRepoName, stargazerCount]);
       } else {
-        getStargazers(inUserName, inRepoName, inPageNum + 1);
+        getStargazers(inUserName, inRepoName, inPageNum + 1, inResults);
       }
     }
     catch(e) {
       dashboard.logString('retrying count stars ' + e);
-      getStargazers(inUserName, inRepoName, inPageNum)
+      getStargazers(inUserName, inRepoName, inPageNum, inResults)
     }
   });
 };

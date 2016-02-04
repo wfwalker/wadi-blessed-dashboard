@@ -26,10 +26,12 @@ wadi.addBugsTrackedBy(1003097); // Worker debugging
 wadi.addBugsTrackedBy(1156054); // Implement Push API on Android
 wadi.addBugsTrackedBy(1201571); // Tracking bug for Push Notifications 
 
-wadi.npmDownloads('oghliner');
-wadi.getStargazers('mozilla', 'oghliner', 1);
-wadi.getStargazers('mozilla', 'platatus', 1);
-wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1);
+gHomeScreenStats = [];
+
+wadi.npmDownloads('oghliner', gHomeScreenStats);
+wadi.getStargazers('mozilla', 'oghliner', 1, gHomeScreenStats);
+wadi.getStargazers('mozilla', 'platatus', 1, gHomeScreenStats);
+wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1, gHomeScreenStats);
 
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 300000);
@@ -40,7 +42,8 @@ server.engine('handlebars', expressHandlebars({defaultLayout: 'main'}));
 server.set('view engine', 'handlebars');
  
 server.get('/home', function (req, res) {
-    res.render('home');
+    console.log(JSON.stringify(gHomeScreenStats));
+    res.render('home', {stats: gHomeScreenStats});
 });
 
 server.get('/bugs', function (req, res) {
