@@ -1,53 +1,53 @@
 
 <div class="ink-grid">
-  <div class="column-group">
-    <div class="all-100">
+	<div class="column-group">
+		<div class="all-100">
 
-<h2>WADI Events</h2>
+			<h2>WADI Events</h2>
 
-<table class='ink-table medium'>
+			<table class='ink-table medium'>
 
-<thead>
-	<tr>
-		<th class="align-left">Date</th>
-		<th class="align-left">Repo</th>
-		<th class="align-left">Type</th>
-		<th class="align-left">Desc</th>
-		<th class="align-left">Who</th>
-	</tr>
-</thead>
+				<thead>
+					<tr>
+						<th class="align-left">Date</th>
+						<th class="align-left">Repo</th>
+						<th class="align-left">Type</th>
+						<th class="align-left">Desc</th>
+						<th class="align-left">Who</th>
+					</tr>
+				</thead>
 
-<tbody>
-{{#each events}}
-	<tr>
-	    <td>{{this.created_at}}</td>
+				<tbody>
+					{{#each events}}
+					<tr>
+						<td>{{this.created_at}}</td>
 
-	    <td>{{this.repo.name}}</td>
+						<td>{{this.repo.name}}</td>
 
-	    <td>{{this.type}}</td>
+						<td>{{this.type}}</td>
 
-	    <td>
-			{{#if this.payload.comment.html_url}}
-				<a href='{{this.payload.comment.html_url}}'>comment</a>
-			{{/if}}
-	    	{{this.payload.pull_request.title}}
-		    {{this.payload.issue.body}}
-		    {{this.payload.comment.body}}
-		    {{this.payload.commits.0.message}}
-		    {{this.payload.description}}
-	    </td>
+						<td>
+							{{#if this.payload.comment.html_url}}
+							<a href='{{this.payload.comment.html_url}}'>comment</a>
+							{{/if}}
+							{{this.payload.pull_request.title}}
+							{{this.payload.issue.body}}
+							{{this.payload.comment.body}}
+							{{this.payload.commits.0.message}}
+							{{this.payload.description}}
+						</td>
 
-	    <td>
-	    {{#if this.actor}}
-	    	<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
-	    {{/if}} 
-	    </td>   
-    </tr>
-{{/each}}
-</tbody>	
-</table>
+						<td>
+							{{#if this.actor}}
+							<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
+							{{/if}} 
+						</td>   
+					</tr>
+					{{/each}}
+				</tbody>	
+			</table>
 
-</div>
-</div>
+		</div>
+	</div>
 </div>
 

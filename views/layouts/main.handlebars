@@ -1,30 +1,40 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
-    <title>WADI activity</title>
+    <title>WADI</title>
 
-	<link rel="stylesheet" type="text/css" href="http://fastly.ink.sapo.pt/3.1.10/css/ink.css"> <!-- inks css file -->
-	<script type="text/javascript" src="http://fastly.ink.sapo.pt/3.1.10/js/ink-all.js"></script> <!-- inks js bundle -->
+    <link rel="stylesheet" type="text/css" href="http://fastly.ink.sapo.pt/3.1.10/css/ink.css"> <!-- inks css file -->
+    <script type="text/javascript" src="http://fastly.ink.sapo.pt/3.1.10/js/ink-all.js"></script> <!-- inks js bundle -->
+
+    <style type="text/css">
+        .bugstatus-RESOLVED {
+            color: gray;
+        }
+        .bugstatus-NEW {
+            color: red;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="ink-grid">
-  <div class="column-group">
-    <div class="all-50">
-
-<nav class="ink-navigation vertical-space">
-    <ul class="menu horizontal black">
-        <li><a href="/events">Events</a></li>
-        <li><a href="/bugs">Bugs</a></li>
-    </ul>
-</nav>
- 
- </div>
-</div>
-</div>
+    <div class="ink-grid">
+        <div class="column-group">
+            <div class="all-100">
+                <nav class="ink-navigation vertical-space">
+                    <ul class="menu horizontal black">
+                        <li><a href="/home">Home</a></li>
+                        <li><a href="/events">Events</a></li>
+                        <li><a href="/bugs">Bugs</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
 
     {{{body}}}
- 
+
 </body>
 </html>

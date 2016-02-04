@@ -1,34 +1,39 @@
 
 <div class="ink-grid">
-  <div class="column-group">
-    <div class="all-100">
+	<div class="column-group">
+		<div class="all-100">
 
-<h2>WADI Bugs</h2>
+			<h2>WADI Bugs</h2>
 
-<table class='ink-table medium'>
+			<table class='ink-table medium'>
 
-<thead>
-	<tr>
-		<th class="align-left">ID</th>
-		<th class="align-left">Date</th>
-		<th class="align-left">Who</th>
-		<th class="align-left">Summary</th>
-	</tr>
-</thead>
+				<thead>
+					<tr>
+						<th class="align-left">ID</th>
+						<th class="align-left">Date</th>
+						<th class="align-left">Status</th>
+						<th class="align-left">Who</th>
+						<th class="align-left">Summary</th>
+					</tr>
+				</thead>
 
-<tbody>
-{{#each bugs}}
-	<tr>
-	    <td>{{this.data.id}}</td>
-	    <td>{{this.latest}}</td>
-	    <td>{{this.data.assigned_to}}</td>
-	    <td>{{this.data.summary}}</td>
-    </tr>
-{{/each}}
-</tbody>	
-</table>
+				<tbody>
+					{{#each bugs}}
+					<tr>
+						<td>
+							<a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.data.id}}'>{{this.data.id}}</a>
+						</td>
+						<td>{{this.latest}}</td>
+						<td class='bugstatus-{{this.data.status}}'>{{this.data.status}}</td>
+						<td>{{this.data.assigned_to}}</td>
+						<td>{{this.data.summary}}</td>
+					</tr>
+					{{/each}}
+				</tbody>
 
-</div>
-</div>
+			</table>
+
+		</div>
+	</div>
 </div>
 
