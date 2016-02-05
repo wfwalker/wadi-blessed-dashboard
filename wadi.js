@@ -206,7 +206,7 @@ function npmDownloads(inPackageName, inResults) {
   request({ uri: 'https://api.npmjs.org/downloads/point/last-month/' + inPackageName, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
     var parsedResult = JSON.parse(body);
     dashboard.logString(inPackageName + ', ' + parsedResult.downloads + ' downloads last 30 days');
-    inResults.push(['npm downloads for ' + inPackageName, parsedResult.downloads]);
+    inResults['npm downloads for ' + inPackageName] = parsedResult.downloads;
   });
 }
 
@@ -292,7 +292,7 @@ function getStargazers(inUserName, inRepoName, inPageNum, inResults) {
       if (stargazers.length < 100) {
         var stargazerCount = (inPageNum - 1) * 100 + stargazers.length;
         dashboard.logString(inUserName + '/' + inRepoName + ' has ' + stargazerCount + ' stargazers');
-        inResults.push(['stargazers for ' + inRepoName, stargazerCount]);
+        inResults['stargazers for ' + inRepoName] = stargazerCount;
       } else {
         getStargazers(inUserName, inRepoName, inPageNum + 1, inResults);
       }

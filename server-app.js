@@ -26,9 +26,10 @@ wadi.addBugsTrackedBy(1003097); // Worker debugging
 wadi.addBugsTrackedBy(1156054); // Implement Push API on Android
 wadi.addBugsTrackedBy(1201571); // Tracking bug for Push Notifications 
 
-gHomeScreenStats = [];
+gHomeScreenStats = {};
 
 wadi.npmDownloads('oghliner', gHomeScreenStats);
+wadi.getStargazers('marco-c', 'wp-web-push', 1, gHomeScreenStats);
 wadi.getStargazers('mozilla', 'oghliner', 1, gHomeScreenStats);
 wadi.getStargazers('mozilla', 'platatus', 1, gHomeScreenStats);
 wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1, gHomeScreenStats);

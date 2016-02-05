@@ -1,12 +1,17 @@
 
 <div class="ink-grid">
 	<div class="column-group">
-		<div class="all-100">
+		<div class="all-50">
 			<h2>WADI</h2>
 
-			{{#each stats}}
-				<div>{{this}}</div>
+			<table class='ink-table'>
+			{{#each stats as |value key|}}
+				<tr>
+					<td>{{key}}</td>
+					<td class='align-right'>{{value}}</td>
+				</tr>
 			{{/each}}
+			</table>
 		</div>
 	</div>
 </div>
