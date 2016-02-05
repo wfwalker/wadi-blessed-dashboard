@@ -48,7 +48,20 @@ server.get('/home', function (req, res) {
 });
 
 server.get('/bugs', function (req, res) {
-  res.render('bugs', {bugs: wadi.getAllBugInfo()});
+  var bugDictionary = wadi.getAllBugInfo();
+  var keys = Object.keys(bugDictionary);
+  var bugArray = keys.map(function (k) { return bugDictionary[k]; });
+  var sortedBugs = bugArray.sort(function(x, y) {
+    if (x.latest < y.latest) {
+      return 1;
+    } else if (x.latest > y.latest) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  res.render('bugs', {bugs: sortedBugs});
 });
 
 server.get('/events', function (req, res) {

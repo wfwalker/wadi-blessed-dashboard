@@ -237,9 +237,9 @@ function addBugDetails(inBugIDList) {
           // and for each unresolved bug ID, go find info for that bug
           if (trackedBug.status != 'RESOLVED') {
             addAttachmentInfo(trackedBug.id);
-            addHistoryInfo(trackedBug.id);
           }
 
+          addHistoryInfo(trackedBug.id);
           getBugInfo(trackedBug.id).data = trackedBug;
           updateSummary(trackedBug.id);
         }
