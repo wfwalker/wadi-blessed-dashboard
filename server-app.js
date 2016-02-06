@@ -6,17 +6,23 @@ var expressHandlebars  = require('express-handlebars');
 
 // go find all the activity for wadi repo's
 
+var gRepositories = [
+  { user: 'mozilla', repo: 'oghliner' },
+  { user: 'mozilla', repo: 'platatus' },
+  { user: 'mozilla', repo: 'serviceworker-cookbook' },
+  { user: 'mozilla', repo: 'progressive-apps-hq' },
+  { user: 'marco-c', repo: 'wp-web-push' },
+  { user: 'marco-c', repo: 'web-push' },
+  { user: 'marco-c', repo: 'mercurius' },
+  { user: 'darkwing', repo: 'wp-sw-cache' },
+];
+
 wadi.setDashboard(dashboard);
 
 function trackWADIRepositories() {
-  wadi.addEventsFromRepo('mozilla', 'oghliner');
-  wadi.addEventsFromRepo('mozilla', 'platatus');
-  wadi.addEventsFromRepo('mozilla', 'serviceworker-cookbook');
-  wadi.addEventsFromRepo('mozilla', 'progressive-apps-hq');
-  wadi.addEventsFromRepo('marco-c', 'wp-web-push');
-  wadi.addEventsFromRepo('darkwing', 'wp-sw-cache');
-  wadi.addEventsFromRepo('marco-c', 'web-push');
-  wadi.addEventsFromRepo('marco-c', 'mercurius');
+  gRepositories.forEach(function (r) {
+      wadi.addEventsFromRepo(r.user, r.repo);
+  });
 }
 
 wadi.addBugsTrackedBy(1201717); // web app developer initiative tracker
@@ -29,10 +35,10 @@ wadi.addBugsTrackedBy(1201571); // Tracking bug for Push Notifications
 gHomeScreenStats = {};
 
 wadi.npmDownloads('oghliner', gHomeScreenStats);
-wadi.getStargazers('marco-c', 'wp-web-push', 1, gHomeScreenStats);
-wadi.getStargazers('mozilla', 'oghliner', 1, gHomeScreenStats);
-wadi.getStargazers('mozilla', 'platatus', 1, gHomeScreenStats);
-wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1, gHomeScreenStats);
+
+gRepositories.forEach(function(r) {
+  wadi.getStargazers(r.user, r.repo, 1, gHomeScreenStats);
+});
 
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 300000);
