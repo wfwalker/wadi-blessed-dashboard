@@ -1,6 +1,7 @@
 var dashboard = require('./dashboard.js');
 var wadi = require('./wadi.js');
 
+gHomeScreenStats = {};
 
 // go find all the activity for wadi repo's
 
@@ -27,10 +28,10 @@ wadi.addBugsTrackedBy(1003097); // Worker debugging
 wadi.addBugsTrackedBy(1156054); // Implement Push API on Android
 wadi.addBugsTrackedBy(1201571); // Tracking bug for Push Notifications 
 
-wadi.npmDownloads('oghliner');
-wadi.getStargazers('mozilla', 'oghliner', 1);
-wadi.getStargazers('mozilla', 'platatus', 1);
-wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1);
+wadi.npmDownloads('oghliner', gHomeScreenStats);
+wadi.getStargazers('mozilla', 'oghliner', 1, gHomeScreenStats);
+wadi.getStargazers('mozilla', 'platatus', 1, gHomeScreenStats);
+wadi.getStargazers('mozilla', 'serviceworker-cookbook', 1, gHomeScreenStats);
 
 trackWADIRepositories();
 setInterval(trackWADIRepositories, 300000);
