@@ -20,7 +20,7 @@
 				<tbody>
 					{{#each events}}
 					<tr>
-						<td>{{this.created_at}}</td>
+						<td>{{truncate this.created_at 10}}</td>
 
 						<td>
 							<a target='_blank' href='https://github.com/{{this.repo.name}}'>{{this.repo.name}}</a>
@@ -30,13 +30,13 @@
 
 						<td>
 							{{#if this.payload.comment.html_url}}
-							<a href='{{this.payload.comment.html_url}}'>comment</a>
+							<a target='_blank' href='{{this.payload.comment.html_url}}'>comment</a>
 							{{/if}}
-							{{this.payload.pull_request.title}}
-							{{this.payload.issue.body}}
-							{{this.payload.comment.body}}
-							{{this.payload.commits.0.message}}
-							{{this.payload.description}}
+							{{truncate this.payload.pull_request.title 80}}
+							{{truncate this.payload.issue.body 80}}
+							{{truncate this.payload.comment.body 80}}
+							{{truncate this.payload.commits.0.message 80}}
+							{{truncate this.payload.description 80}}
 						</td>
 
 						<td>

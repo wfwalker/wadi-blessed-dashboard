@@ -45,9 +45,24 @@ setInterval(trackWADIRepositories, 300000);
 
 var server = express();
 
-server.engine('handlebars', expressHandlebars({defaultLayout: 'main'}));
+server.engine('handlebars', expressHandlebars({
+  defaultLayout: 'main',
+  helpers: {
+    toJSON : function(object) {
+      return JSON.stringify(object);
+    },
+    truncate : function(inString, inLength) {
+      if (inString) {
+        return inString.substring(0, inLength);
+      } else {
+        return inString;
+      }
+    },
+  }
+}));
+
 server.set('view engine', 'handlebars');
- 
+
 server.get('/home', function (req, res) {
     console.log(JSON.stringify(gHomeScreenStats));
     res.render('home', {stats: gHomeScreenStats});
