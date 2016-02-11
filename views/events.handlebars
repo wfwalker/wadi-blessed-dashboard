@@ -1,4 +1,3 @@
-
 <div class="ink-grid">
 	<div class="column-group">
 		<div class="all-100">
@@ -27,15 +26,14 @@
 
 						<td>
 							{{#if this.payload.comment.html_url}}
-								<a target='_blank' href='{{this.payload.comment.html_url}}'>comment</a>
+								<div><a target='_blank' href='{{this.payload.comment.html_url}}'>{{truncate this.payload.comment.body 60}}</a></div>
 							{{/if}}
 							{{#each this.payload.commits}}
 								<div><a target='_blank' href='https://github.com/{{../this.repo.name}}/commit/{{this.sha}}''>{{truncate this.message 80}}</a></div>
 							{{/each}}
-							{{truncate this.payload.pull_request.title 60}}
-							{{truncate this.payload.issue.body 60}}
-							{{truncate this.payload.comment.body 60}}
-							{{truncate this.payload.description 60}}
+							<div>{{truncate this.payload.pull_request.title 60}}</div>
+							<div>{{truncate this.payload.issue.body 60}}</div>
+							<div>{{truncate this.payload.description 60}}</div>
 						</td>
 
 						<td>
