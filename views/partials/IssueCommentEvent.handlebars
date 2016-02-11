@@ -1,5 +1,5 @@
-IssueCommentEvent
-
+{{this.payload.action}} comment
 {{#if this.payload.comment.html_url}}
-	<div><a target='_blank' href='{{this.payload.comment.html_url}}'>{{truncate this.payload.comment.body 60}}</a></div>
+	<a target='_blank' href='{{this.payload.comment.html_url}}'>{{truncate this.payload.comment.body 60}}</a>
 {{/if}}
+on issue #{{this.payload.issue.number}}, {{this.payload.issue.title}}
