@@ -48,9 +48,6 @@ var server = express();
 server.engine('handlebars', expressHandlebars({
   defaultLayout: 'main',
   helpers: {
-    toJSON : function(object) {
-      return JSON.stringify(object);
-    },
     truncate : function(inString, inLength) {
       if (inString) {
         return inString.substring(0, inLength);

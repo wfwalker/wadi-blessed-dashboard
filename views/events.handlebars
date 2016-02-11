@@ -11,7 +11,6 @@
 					<tr>
 						<th class="align-left">Date</th>
 						<th class="align-left">Repo</th>
-						<th class="align-left">Type</th>
 						<th class="align-left">Desc</th>
 						<th class="align-left">Who</th>
 					</tr>
@@ -26,22 +25,22 @@
 							<a target='_blank' href='https://github.com/{{this.repo.name}}'>{{this.repo.name}}</a>
 						</td>
 
-						<td>{{this.type}}</td>
-
 						<td>
 							{{#if this.payload.comment.html_url}}
-							<a target='_blank' href='{{this.payload.comment.html_url}}'>comment</a>
+								<a target='_blank' href='{{this.payload.comment.html_url}}'>comment</a>
 							{{/if}}
-							{{truncate this.payload.pull_request.title 80}}
-							{{truncate this.payload.issue.body 80}}
-							{{truncate this.payload.comment.body 80}}
-							{{truncate this.payload.commits.0.message 80}}
-							{{truncate this.payload.description 80}}
+							{{#each this.payload.commits}}
+								<div><a target='_blank' href='https://github.com/{{../this.repo.name}}/commit/{{this.sha}}''>{{truncate this.message 80}}</a></div>
+							{{/each}}
+							{{truncate this.payload.pull_request.title 60}}
+							{{truncate this.payload.issue.body 60}}
+							{{truncate this.payload.comment.body 60}}
+							{{truncate this.payload.description 60}}
 						</td>
 
 						<td>
 							{{#if this.actor}}
-							<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
+								<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
 							{{/if}} 
 						</td>   
 					</tr>
