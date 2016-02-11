@@ -314,10 +314,13 @@ function addEventsFromRepo(inUserName, inRepoName) {
       for (var activityIndex in activities) {
         var anActivity = activities[activityIndex];
         try {
+          if (! anActivity.type) {
+            throw new Error('no type for activity ' + JSON.stringify(anActivity));
+          }
           allEvents[anActivity.created_at] = dashboard.formatForEventBox(inRepoName, anActivity);
         }
         catch (e) {
-          allEvents[anActivity.created_at] = 'ERROR ' + e;
+          console.log('activity error', e);
         }
       }
       dashboard.redrawEvents(allEvents);
