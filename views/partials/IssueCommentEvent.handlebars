@@ -1,0 +1,5 @@
+IssueCommentEvent
+
+{{#if this.payload.comment.html_url}}
+	<div><a target='_blank' href='{{this.payload.comment.html_url}}'>{{truncate this.payload.comment.body 60}}</a></div>
+{{/if}}

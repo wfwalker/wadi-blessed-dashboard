@@ -1,0 +1,5 @@
+pushed {{this.payload.size}} commits
+
+{{#each this.payload.commits}}
+	<div><a target='_blank' href='https://github.com/{{../this.repo.name}}/commit/{{this.sha}}''>{{truncate this.message 80}}</a></div>
+{{/each}}

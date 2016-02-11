@@ -10,8 +10,7 @@
 					<tr>
 						<th class="align-left">Date</th>
 						<th class="align-left">Repo</th>
-						<th class="align-left">Desc</th>
-						<th class="align-left">Who</th>
+						<th class="align-left">Event</th>
 					</tr>
 				</thead>
 
@@ -25,22 +24,12 @@
 						</td>
 
 						<td>
-							{{#if this.payload.comment.html_url}}
-								<div><a target='_blank' href='{{this.payload.comment.html_url}}'>{{truncate this.payload.comment.body 60}}</a></div>
-							{{/if}}
-							{{#each this.payload.commits}}
-								<div><a target='_blank' href='https://github.com/{{../this.repo.name}}/commit/{{this.sha}}''>{{truncate this.message 80}}</a></div>
-							{{/each}}
-							<div>{{truncate this.payload.pull_request.title 60}}</div>
-							<div>{{truncate this.payload.issue.body 60}}</div>
-							<div>{{truncate this.payload.description 60}}</div>
-						</td>
-
-						<td>
 							{{#if this.actor}}
 								<a target='_blank' href='https://github.com/{{this.actor.login}}'>{{this.actor.login}}</a>
 							{{/if}} 
-						</td>   
+
+							{{> (activityType this) this }}
+						</td>
 					</tr>
 					{{/each}}
 				</tbody>	

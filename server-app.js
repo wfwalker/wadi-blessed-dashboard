@@ -55,6 +55,9 @@ server.engine('handlebars', expressHandlebars({
         return inString;
       }
     },
+    activityType : function (inActivity) {
+      return inActivity.type;
+    },
   }
 }));
 
@@ -67,7 +70,7 @@ server.get('/home', function (req, res) {
 
 server.get('/bugs', function (req, res) {
   var bugDictionary = wadi.getAllBugInfo();
-  var keys = Object.keys(bugDictionary);
+  var keys = Object.getOwnPropertyNames(bugDictionary);
   var bugArray = keys.map(function (k) { return bugDictionary[k]; });
   var sortedBugs = bugArray.sort(function(x, y) {
     if (x.latest < y.latest) {
@@ -84,7 +87,7 @@ server.get('/bugs', function (req, res) {
 
 server.get('/events', function (req, res) {
   var events = wadi.getAllEvents();
-  var keys = Object.keys(wadi.getAllEvents());
+  var keys = Object.getOwnPropertyNames(wadi.getAllEvents());
 
   keys.sort();
   keys.reverse();
