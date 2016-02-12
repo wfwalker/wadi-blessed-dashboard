@@ -58,6 +58,9 @@ server.engine('handlebars', expressHandlebars({
     activityType : function (inActivity) {
       return inActivity.type;
     },
+    somebodyAssigned: function (assignee) {
+      return (assignee != 'nobody@mozilla.org');
+    }
   }
 }));
 

@@ -9,7 +9,7 @@
 
 				<thead>
 					<tr>
-						<th class="align-left">ID</th>
+						<th class="align-right">ID</th>
 						<th class="align-left">Date</th>
 						<th class="align-left">Status</th>
 						<th class="align-left">Who</th>
@@ -20,12 +20,16 @@
 				<tbody>
 					{{#each bugs}}
 					<tr>
-						<td>
+						<td class="align-right">
 							<a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.data.id}}'>{{this.data.id}}</a>
 						</td>
-						<td>{{this.latest}}</td>
+						<td>{{truncate this.latest 10}}</td>
 						<td class='bugstatus-{{this.data.status}}'>{{this.data.status}}</td>
-						<td>{{this.data.assigned_to}}</td>
+						<td>
+							{{#if (somebodyAssigned this.data.assigned_to)}}
+								{{this.data.assigned_to}}
+							{{/if}}
+						</td>
 						<td>{{this.data.summary}}</td>
 					</tr>
 					{{/each}}
