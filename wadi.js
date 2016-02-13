@@ -313,16 +313,15 @@ function addEventsFromRepo(inUserName, inRepoName) {
 
       for (var activityIndex in activities) {
         var anActivity = activities[activityIndex];
-        try {
-          if (! anActivity.type) {
-            throw new Error('no type for activity ' + JSON.stringify(anActivity));
-          }
-          allEvents[anActivity.created_at] = dashboard.formatForEventBox(inRepoName, anActivity);
-        }
-        catch (e) {
-          console.log('activity error', e);
+        if (anActivity['x-ratelimit-limit']) {
+          console.log('rate limit info', anActivity['x-ratelimit-remaining'], '/', anActivity['x-ratelimit-limit']);
+        } else if (! anActivity.type) {
+          console.log('missing type', inUserName, inRepoName, JSON.stringify(anActivity));
+        } else {
+          allEvents[anActivity.created_at] = dashboard.formatForEventBox(inRepoName, anActivity);          
         }
       }
+
       dashboard.redrawEvents(allEvents);
     }
     catch(e) {
