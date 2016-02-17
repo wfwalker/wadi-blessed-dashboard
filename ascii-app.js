@@ -15,7 +15,7 @@ function trackWADIRepositories() {
   wadi.addEventsFromRepo('mozilla', 'platatus');
   wadi.addEventsFromRepo('mozilla', 'serviceworker-cookbook');
   wadi.addEventsFromRepo('mozilla', 'progressive-apps-hq');
-  wadi.addEventsFromRepo('marco-c', 'wp-web-push');
+  wadi.addEventsFromRepo('mozilla', 'wp-web-push');
   wadi.addEventsFromRepo('darkwing', 'wp-sw-cache');
   wadi.addEventsFromRepo('marco-c', 'web-push');
   wadi.addEventsFromRepo('marco-c', 'mercurius');
