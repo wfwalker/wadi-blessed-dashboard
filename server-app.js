@@ -58,13 +58,15 @@ server.engine('handlebars', expressHandlebars({
     activityType : function (inActivity) {
       return inActivity.type;
     },
+    historyType : function (inHistory) {
+      return inHistory.field_name;
+    },
     somebodyAssigned: function (assignee) {
       return (assignee != 'nobody@mozilla.org');
     },
     noteworthy: function (historyItem) {
       var when = new Date(historyItem.when);
       var days = (new Date() - when) / (24*60*60*1000);
-      console.log('compare', when, days);
       return days < 7;
     },
     stringify: function (json) {

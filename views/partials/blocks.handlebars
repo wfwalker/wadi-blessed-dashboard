@@ -1,0 +1,7 @@
+blocks
+{{#if this.added}}
+	<a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.added}}'>{{this.added}}</a>
+{{/if}}
+{{#if this.removed}}
+	<span style='text-decoration: line-through'><a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.removed}}'>{{this.removed}}</a></span>
+{{/if}}
