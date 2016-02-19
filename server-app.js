@@ -60,6 +60,15 @@ server.engine('handlebars', expressHandlebars({
     },
     somebodyAssigned: function (assignee) {
       return (assignee != 'nobody@mozilla.org');
+    },
+    noteworthy: function (historyItem) {
+      var when = new Date(historyItem.when);
+      var days = (new Date() - when) / (24*60*60*1000);
+      console.log('compare', when, days);
+      return days < 7;
+    },
+    stringify: function (json) {
+      return JSON.stringify(json);
     }
   }
 }));

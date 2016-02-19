@@ -32,6 +32,29 @@
 						</td>
 						<td>{{this.data.summary}}</td>
 					</tr>
+						{{#each this.history}}
+							{{#if (noteworthy this)}}
+								<tr>
+									<td></td>
+									<td>{{truncate this.when 10}}</td>
+									<td></td>
+									<td>{{this.who}}</td>
+									<td>
+										{{#each this.changes}}
+											<div>
+												{{this.field_name}}
+												{{#if this.added}}
+													add {{this.added}}
+												{{/if}}
+												{{#if this.removed}}
+													remove {{this.removed}}
+												{{/if}}
+											</div>
+										{{/each}}
+									</td>
+								</tr>
+							{{/if}}
+						{{/each}}
 					{{/each}}
 				</tbody>
 
