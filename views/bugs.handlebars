@@ -19,21 +19,21 @@
 
 				<tbody>
 					{{#each bugs}}
-					<tr class='grey'>
-						<td class="align-right">
-							<a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.data.id}}'>{{this.data.id}}</a>
-						</td>
-						<td>{{truncate this.latest 10}}</td>
-						<td class='bugstatus-{{this.data.status}}'>{{this.data.status}}</td>
-						<td>
-							{{#if (somebodyAssigned this.data.assigned_to)}}
-								{{this.data.assigned_to}}
-							{{/if}}
-						</td>
-						<td>{{this.data.summary}}</td>
-					</tr>
+						<tr class='grey'>
+							<td class="align-right">
+								<a target='_blank' href='https://bugzilla.mozilla.org/show_bug.cgi?id={{this.data.id}}'>{{this.data.id}}</a>
+							</td>
+							<td>{{truncate this.latest 10}}</td>
+							<td class='bugstatus-{{this.data.status}}'>{{this.data.status}}</td>
+							<td>
+								{{#if (somebodyAssigned this.data.assigned_to)}}
+									{{this.data.assigned_to}}
+								{{/if}}
+							</td>
+							<td>{{this.data.summary}}</td>
+						</tr>
 						{{#each this.history}}
-							{{#if (noteworthy this)}}
+							{{#if (recent this.when)}}
 								<tr>
 									<td></td>
 									<td>{{truncate this.when 10}}</td>
@@ -43,6 +43,19 @@
 										{{#each this.changes}}
 											{{> (historyType this) this }}
 										{{/each}}
+									</td>
+								</tr>
+							{{/if}}
+						{{/each}}
+						{{#each this.comments}}
+							{{#if (recent this.creation_time)}}
+								<tr>
+									<td></td>
+									<td>{{truncate this.creation_time 10}}</td>
+									<td></td>
+									<td>{{this.creator}}</td>
+									<td>
+										{{truncate this.text 60}}
 									</td>
 								</tr>
 							{{/if}}

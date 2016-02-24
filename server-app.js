@@ -15,6 +15,7 @@ var gRepositories = [
   { user: 'marco-c', repo: 'web-push' },
   { user: 'marco-c', repo: 'mercurius' },
   { user: 'darkwing', repo: 'wp-sw-cache' },
+  { user: 'owencm', repo: 'ModernWebSummitWorkshop' },
 ];
 
 wadi.setDashboard(dashboard);
@@ -64,8 +65,8 @@ server.engine('handlebars', expressHandlebars({
     somebodyAssigned: function (assignee) {
       return (assignee != 'nobody@mozilla.org');
     },
-    noteworthy: function (historyItem) {
-      var when = new Date(historyItem.when);
+    recent: function (dateField) {
+      var when = new Date(dateField);
       var days = (new Date() - when) / (24*60*60*1000);
       return days < 7;
     },

@@ -60,7 +60,72 @@ github.authenticate({
 
 // go find all the bugs we are tracking for WADI
 
-// TODO get all history https://bugzilla.mozilla.org/rest/bug/707428/history
+
+function addComments(inBugID) {
+  var commentURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/comment?api_key=" + process.env.BSEKRIT;
+  request({ uri: commentURL, strictSSL: false, timeout: globalTimeout }, function(error, response, body) {
+    try {
+      if (error) {
+        throw new Error(error);
+      }
+      if (response.statusCode != 200) {
+        throw new Error('bad response ' + response.statusCode);
+      }
+
+      // try to parse the response and find the list of bugs
+      var parsedResult = JSON.parse(body);
+
+      if (parsedResult == null) {
+        throw new Error('cannot parse body');
+      }
+
+      if (parsedResult.error) {
+        throw new Error(parsedResult.message);
+      }
+
+      // if this attachments info includes a bug id...
+      // NOTE: history API returns a list of bug ID's
+      // whereas comments API returns a dictionary of bug ID's :-/
+      if (Object.keys(parsedResult.bugs)) {
+        // ... use it
+        var tmpBugID = Object.keys(parsedResult.bugs)[0];
+
+        // ... if there's a comment list
+        if (parsedResult.bugs[tmpBugID].comments && parsedResult.bugs[tmpBugID].comments.length > 0) {
+          var myComments = parsedResult.bugs[tmpBugID].comments;
+
+          // store them in the global dictionary
+          getBugInfo(tmpBugID).comments = myComments;
+
+          var latest = myComments[0].time;
+
+          if (myComments.length > 1) {
+            latest = myComments.reduce(function (x, y, i) {
+              if (x.when > y.when) {
+                return x.time;
+              } else {
+                return y.time;
+              }
+            });
+          }
+
+          getBugInfo(tmpBugID).latestComment = latest;
+
+          // if we already have the bug details, go redo the summary
+          if (getBugInfo(tmpBugID).data) {
+            updateSummary(tmpBugID);
+          }
+        } else {
+          dashboard.logString('no comments or empty comment');
+        }
+      }
+    }
+    catch (e) {
+      dashboard.logString(inBugID + ' comments error: ' + e);
+    }
+  });
+}
+
 
 function addHistoryInfo(inBugID) {
   var historyURL = "https://bugzilla.mozilla.org/rest/bug/" + inBugID + "/history?api_key=" + process.env.BSEKRIT;
@@ -240,6 +305,7 @@ function addBugDetails(inBugIDList) {
           }
 
           addHistoryInfo(trackedBug.id);
+          addComments(trackedBug.id);
           getBugInfo(trackedBug.id).data = trackedBug;
           updateSummary(trackedBug.id);
         }
