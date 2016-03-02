@@ -78,6 +78,9 @@ server.engine('handlebars', expressHandlebars({
 
 server.set('view engine', 'handlebars');
 
+server.use('/lib', express.static('lib'));
+server.use('/fonts', express.static('fonts'));
+
 server.get('/home', function (req, res) {
     console.log(JSON.stringify(gHomeScreenStats));
     res.render('home', {stats: gHomeScreenStats});
