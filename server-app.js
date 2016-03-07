@@ -12,6 +12,7 @@ var gRepositories = [
   { user: 'mozilla', repo: 'serviceworker-cookbook' },
   { user: 'mozilla', repo: 'progressive-apps-hq' },
   { user: 'mozilla', repo: 'wp-web-push' },
+  { user: 'mozilla', repo: 'wp-add-to-homescreen' },
   { user: 'marco-c', repo: 'web-push' },
   { user: 'marco-c', repo: 'mercurius' },
   { user: 'darkwing', repo: 'wp-sw-cache' },
